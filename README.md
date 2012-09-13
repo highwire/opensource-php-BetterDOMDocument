@@ -6,7 +6,7 @@ BetterDOMDocyment is a handy PHP utility class for working with XML. It's a wrap
 // We can load a new BetterDOMDocument from either a string or a DOMNode object
 $dom = new BetterDOMDocument($xmlstring);
 
-// It's easy to output the entire documenent as an array, which is sometimes easier to work with in PHP
+// It's easy to output the entire document as an array, which is sometimes easier to work with in PHP
 $array = dom->getArray();
 
 // It's easy to query too!
