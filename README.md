@@ -1,4 +1,4 @@
-BetterDOMDocyment is a handy PHP utility class for working with XML. It's a wrapper for PHP's built in DOMDocument that provides a bunch of nice little shortcuts. 
+BetterDOMDocument is a handy PHP utility class for working with XML. It's a wrapper for PHP's built in DOMDocument that provides a bunch of nice little shortcuts. 
 
 ```php
 <?php
