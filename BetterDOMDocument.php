@@ -4,7 +4,6 @@
  *
  * Copyright (c) 2010-2011 Board of Trustees, Leland Stanford Jr. University
  * This software is open-source licensed under the GNU Public License Version 2 or later
- * The full license is available in the LICENSE.TXT file at the root of this repository
  */
 
 class BetterDOMDocument extends DOMDocument {
