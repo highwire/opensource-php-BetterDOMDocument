@@ -15,7 +15,8 @@ $node_list = $dom->query('//xpath/to/node', $optional_context_node);
 // If you know you're only going to find a single DOMNode, you can use a querySingle
 $dom_node = $dom->querySingle('//xpath/to/node');
 
-// If you need to register a namespace, thats a snap, but note that BetterDOMDocument can also auto-detect them if you pass TRUE as a second parameter to the contsructor.
+// If you need to register a namespace, thats a snap.
+// Note that it can auto-detect them if you pass TRUE as a second parameter to the constructor.
 $dom->registerNamespace('kml','http://www.opengis.net/kml/2.2');
 
 // Swapping out DOMNodes is really easy
