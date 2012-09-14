@@ -1,4 +1,4 @@
-A nice handy wrapper for PHP's built in DOMDocument. Provides a bunch of nice little shortcuts. 
+BetterDOMDocument is a handy PHP utility class for working with XML. It's a wrapper for PHP's built in DOMDocument that provides a bunch of nice little shortcuts. 
 
 ```php
 <?php
@@ -6,13 +6,13 @@ A nice handy wrapper for PHP's built in DOMDocument. Provides a bunch of nice li
 // We can load a new BetterDOMDocument from either a string or a DOMNode object
 $dom = new BetterDOMDocument($xmlstring);
 
-// It's easy to output the entire documenent as an array, which is sometimes easier to work with in PHP
+// It's easy to output the entire document as an array, which is sometimes easier to work with in PHP
 $array = dom->getArray();
 
 // It's easy to query too!
 $node_list = $dom->query('//xpath/to/node', $optional_context_node);
 
-// If you know you're only going to find a single DOMNode, you can use a query_single
+// If you know you're only going to find a single DOMNode, you can use a querySingle
 $dom_node = $dom->querySingle('//xpath/to/node');
 
 // If you need to register a namespace, thats a snap
