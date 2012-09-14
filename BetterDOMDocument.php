@@ -9,15 +9,28 @@
 class BetterDOMDocument extends DOMDocument {
 
   private $ns = array();
+  public  $strictErrorChecking = FALSE;
 
-  function __construct($xml = FALSE) {
+  function __construct($xml = FALSE, $auto_register_namespaces = FALSE) {
     parent::__construct();
     if(is_object($xml)){
       $this->appendChild($this->importNode($xml, true));
     }
 
-    if (is_string($xml)) {
-      @$this->loadXML($xml);
+    if ($xml && is_string($xml)) {
+      $this->loadXML($xml);
+
+      // There is no way in DOMDocument to auto-detect or list namespaces.
+      // Regretably the only option is to parse the first container element for xmlns psudo-attributes
+      if ($auto_register_namespaces) {
+        if (preg_match('/<[^\?^!].+?>/s', $xml, $elem_match)) {
+          if (preg_match_all('/xmlns:(.+?)=.*?["\'](.+?)["\']/s', $elem_match[0], $ns_matches)) {
+            foreach ($ns_matches[1] as $i => $ns_key) {
+              $this->registerNamespace(trim($ns_key), trim($ns_matches[2][$i]));
+            }
+          }
+        }
+      }
     }
   }
 
@@ -64,6 +77,10 @@ class BetterDOMDocument extends DOMDocument {
     }
 
     return $array;
+  }
+
+  function getNamespaces() {
+    return $this->ns;
   }
 
   function createElementFromXML($xml) {
