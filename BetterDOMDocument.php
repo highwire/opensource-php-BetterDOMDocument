@@ -9,6 +9,7 @@
 class BetterDOMDocument extends DOMDocument {
 
   private $ns = array();
+  private $auto_ns = FALSE;
   public  $strictErrorChecking = FALSE;
 
   function __construct($xml = FALSE, $auto_register_namespaces = FALSE) {
@@ -23,6 +24,7 @@ class BetterDOMDocument extends DOMDocument {
       // There is no way in DOMDocument to auto-detect or list namespaces.
       // Regretably the only option is to parse the first container element for xmlns psudo-attributes
       if ($auto_register_namespaces) {
+        $this->auto_ns = TRUE;
         if (preg_match('/<[^\?^!].+?>/s', $xml, $elem_match)) {
           if (preg_match_all('/xmlns:(.+?)=.*?["\'](.+?)["\']/s', $elem_match[0], $ns_matches)) {
             foreach ($ns_matches[1] as $i => $ns_key) {
@@ -84,7 +86,7 @@ class BetterDOMDocument extends DOMDocument {
   }
 
   function createElementFromXML($xml) {
-    $dom = new BetterDOMDocument($xml);
+    $dom = new BetterDOMDocument($xml, $this->auto_ns);
     if (!$dom->documentElement) {
       highwire_system_message('BetterDomDocument Error: Invalid XML: ' . $xml, 'error');
     }
@@ -114,7 +116,7 @@ class BetterDOMDocument extends DOMDocument {
     }
   }
 
-  function query_single($xpath, $contextnode = NULL) {
+  function querySingle($xpath, $contextnode = NULL) {
     $result = $this->query($xpath, $contextnode);
     if ($result->length) {
       return $result->item(0);
@@ -122,6 +124,11 @@ class BetterDOMDocument extends DOMDocument {
     else {
       return NULL;
     }
+  }
+  
+  // Alias for backwards compat
+  function query_single($xpath, $contextnode = NULL) {
+    return $this->querySingle($xpath, $contextnode);
   }
 
   function registerNamespace($namespace, $url) {
