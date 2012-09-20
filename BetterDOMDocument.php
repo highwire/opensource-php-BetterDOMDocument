@@ -125,7 +125,7 @@ class BetterDOMDocument extends DOMDocument {
       return NULL;
     }
   }
-  
+
   // Alias for backwards compat
   function query_single($xpath, $contextnode = NULL) {
     return $this->querySingle($xpath, $contextnode);
@@ -135,6 +135,7 @@ class BetterDOMDocument extends DOMDocument {
     $this->ns[$namespace] = $url;
   }
 
+  //@@TODO: allow passing of an xpath string
   function replace(&$node, $replace) {
     if (is_string($replace)) {
       $replace = $this->createElementFromXML($replace);
@@ -143,9 +144,30 @@ class BetterDOMDocument extends DOMDocument {
     $node = $replace;
   }
 
+  // Can pass a DOMNode, a DOMNodeList, or an xpath string
+  function remove($node) {
+    if (is_string($node)) {
+      $node = $this->query($node);
+    }
+    if ($node) {
+      if (get_class($node) == 'DOMNodeList') {
+        foreach($node as $item) {
+          $this->remove($item);
+        }
+      }
+      else {
+        $node->parentNode->removeChild($node);
+      }
+    }
+  }
+
+  // contextnode can be either a DOMNode or an xpath string
   function out($contextnode = NULL) {
     if (!$contextnode) {
       $contextnode = $this->firstChild;
+    }
+    if (is_string($contextnode)) {
+      $contextnode = $this->querySingle($contextnode);
     }
     return $this->saveXML($contextnode, LIBXML_NOEMPTYTAG);
   }
