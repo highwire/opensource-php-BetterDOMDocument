@@ -10,16 +10,33 @@ class BetterDOMDocument extends DOMDocument {
 
   private $ns = array();
   private $auto_ns = FALSE;
-  public  $strictErrorChecking = FALSE;
+  public  $error_checking = 'strict'; // Can be 'strict', 'warning', 'none' / FALSE
 
-  function __construct($xml = FALSE, $auto_register_namespaces = FALSE) {
+  function __construct($xml = FALSE, $auto_register_namespaces = FALSE, $error_checking = 'strict') {
     parent::__construct();
+    
+    // Check up error-checking
+    if ($error_checking == FALSE) {
+      $this->error_checking = 'none';
+    }
+    else {
+      $this->error_checking = $error_checking;
+    }
+    if ($this->error_checking != 'strict') {
+      $this->strictErrorChecking = FALSE;
+    }
+    
     if(is_object($xml)){
       $this->appendChild($this->importNode($xml, true));
     }
 
     if ($xml && is_string($xml)) {
-      $this->loadXML($xml);
+      if ($this->error_checking == 'none') {
+        @$this->loadXML($xml);
+      }
+      else {
+        $this->loadXML($xml);
+      }
 
       // There is no way in DOMDocument to auto-detect or list namespaces.
       // Regretably the only option is to parse the first container element for xmlns psudo-attributes
