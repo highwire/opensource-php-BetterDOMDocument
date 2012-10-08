@@ -185,6 +185,7 @@ class BetterDOMDocument extends DOMDocument {
     }
     if (is_string($contextnode)) {
       $contextnode = $this->querySingle($contextnode);
+      if (!$contextnode) return '';
     }
     return $this->saveXML($contextnode, LIBXML_NOEMPTYTAG);
   }
