@@ -8,8 +8,8 @@
 
 class BetterDOMDocument extends DOMDocument {
 
-  private $ns = array();
   private $auto_ns = FALSE;
+  public  $ns = array();
   public  $error_checking = 'strict'; // Can be 'strict', 'warning', 'none' / FALSE
 
   function __construct($xml = FALSE, $auto_register_namespaces = FALSE, $error_checking = 'strict') {
@@ -109,6 +109,19 @@ class BetterDOMDocument extends DOMDocument {
     }
     $element = $dom->documentElement;
     return $this->importNode($element, true);
+  }
+  
+  // Give an xpath or an element, return another BetterDOMDocument
+  function extract($xpath_or_element, $contextnode = NULL) {
+    if (is_string($xpath_or_element)) {
+      $domNode = $this->querySingle($xpath_or_element, $contextnode);
+    }
+    else {
+      $domNode = $xpath_or_element;
+    }
+    $dom = new BetterDOMDocument($domNode);
+    $dom->ns = $this->ns;
+    return $dom;
   }
 
   function query($xpath, $contextnode = NULL) {
