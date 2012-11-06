@@ -115,6 +115,7 @@ class BetterDOMDocument extends DOMDocument {
   function extract($xpath_or_element, $contextnode = NULL) {
     if (is_string($xpath_or_element)) {
       $domNode = $this->querySingle($xpath_or_element, $contextnode);
+      if (!$domNode) return FALSE;
     }
     else {
       $domNode = $xpath_or_element;
