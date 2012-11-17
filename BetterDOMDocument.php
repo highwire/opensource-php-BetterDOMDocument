@@ -166,8 +166,11 @@ class BetterDOMDocument extends DOMDocument {
     $this->ns[$namespace] = $url;
   }
 
-  //@@TODO: allow passing of an xpath string
-  function replace(&$node, $replace) {
+  // Note all objects are passed by reference
+  function replace($node, $replace) {
+    if (is_string($node)) {
+      $node = $this->querySingle($node);
+    }
     if (is_string($replace)) {
       $replace = $this->createElementFromXML($replace);
     }
@@ -195,21 +198,13 @@ class BetterDOMDocument extends DOMDocument {
   // contextnode can be either a DOMNode or an xpath string
   function out($contextnode = NULL) {
     if (!$contextnode) {
-      $contextnodes = array($this->firstChild);
+      $contextnode = $this->firstChild;
     }
-    else if (is_string($contextnode)) {
-      $contextnodes = $this->query($contextnode);
-      if (!count($contextnodes)) return '';
+    if (is_string($contextnode)) {
+      $contextnode = $this->querySingle($contextnode);
+      if (!$contextnode) return '';
     }
-    else {
-      $contextnodes = array($contextnode);
-    }
-    
-    $output = '';
-    foreach ($contextnodes as $context) {
-      $output .= $this->saveXML($context, LIBXML_NOEMPTYTAG);
-    }
-    return $output;
+    return $this->saveXML($contextnode, LIBXML_NOEMPTYTAG);
   }
 
 }
