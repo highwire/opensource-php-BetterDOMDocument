@@ -27,7 +27,15 @@ class BetterDOMDocument extends DOMDocument {
     }
     
     if(is_object($xml)){
-      $this->appendChild($this->importNode($xml, true));
+      $class = get_class($xml);
+      if ($class == 'DOMElement') {
+        $this->appendChild($this->importNode($xml, true));
+      }
+      if ($class == 'DOMDocument') {
+        if ($xml->documentElement) {
+          $this->appendChild($this->importNode($xml->documentElement, true));
+        }
+      }
     }
 
     if ($xml && is_string($xml)) {
@@ -165,6 +173,36 @@ class BetterDOMDocument extends DOMDocument {
   function registerNamespace($namespace, $url) {
     $this->ns[$namespace] = $url;
   }
+  
+  function tranform($xsl, $contextnode = NULL) {
+    if (!$contextnode) {
+      $doc = $this;
+    }
+    else {
+      if (is_string($contextnode)) {
+        $contextnode = $this->querySingle($contextnode);
+      }
+      $doc = new BetterDOMDocument($contextnode);
+    }
+    
+    $xslDoc = new BetterDOMDocument($xsl);
+    $xslt = new XSLTProcessor();
+    $xslt->importStylesheet($xslDoc);
+    
+    return new BetterDomDocument($xslt->transformToDoc($doc));
+  }
+  
+  function asHTML($contextnode = NULL) {
+    $xsl = '
+      <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+        <xsl:template match="*">
+        <span class="{translate(name(.),\':\',\'-\')}"><xsl:apply-templates/></span>
+        </xsl:template>
+      </xsl:stylesheet>';
+    
+    $transformed = $this->tranform($xsl, $contextnode);
+    return $transformed->out();
+  }
 
   // Note all objects are passed by reference
   function replace($node, $replace) {
@@ -204,6 +242,9 @@ class BetterDOMDocument extends DOMDocument {
       $contextnode = $this->querySingle($contextnode);
       if (!$contextnode) return '';
     }
+    
+    if (!$this->documentElement) return '';
+    
     return $this->saveXML($contextnode, LIBXML_NOEMPTYTAG);
   }
 
