@@ -70,10 +70,7 @@ class BetterDOMDocument extends DOMDocument {
         $array['#raw'] = $this->saveXML($node);
       }
       if ($raw == 'inner') {
-        $pattern = "/<".preg_quote($node->nodeName)."\b[^>]*>(.*)<\/".preg_quote($node->nodeName).">/s";
-        $matches = array();
-        preg_match($pattern, $this->saveXML($node), $matches);
-        $array['#raw'] = $matches[1];
+        $array['#raw'] = $this->innerText($node);
       }
       if ($node->hasAttributes()) {
         foreach ($node->attributes as $attr) {
@@ -108,6 +105,21 @@ class BetterDOMDocument extends DOMDocument {
 
   function getNamespaces() {
     return $this->ns;
+  }
+  
+  // Get the inner text of the element
+  function innerText($context = NULL) {
+    if (!$context) {
+      $context = $this->documentElement;
+    }
+    else if (is_string($context)) {
+      $context = $this->querySingle($context);
+    }
+    
+    $pattern = "/<".preg_quote($context->nodeName)."\b[^>]*>(.*)<\/".preg_quote($context->nodeName).">/s";
+    $matches = array();
+    preg_match($pattern, $this->saveXML($context), $matches);
+    return $matches[1];
   }
 
   function createElementFromXML($xml) {
