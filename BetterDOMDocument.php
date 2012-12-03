@@ -130,6 +130,62 @@ class BetterDOMDocument extends DOMDocument {
     $element = $dom->documentElement;
     return $this->importNode($element, true);
   }
+
+  function append($newnode, $ref = NULL) {
+    if (is_string($newnode)) {
+      $newnode = $this->createElementFromXML($newnode);
+    }
+    if (!$ref) {
+      $ref = $this->documentElement;
+    }
+    $ref->insertBefore($newnode, $ref->lastChild);
+  }
+
+  function prepend($newnode, $ref = NULL) {
+    if (is_string($newnode)) {
+      $newnode = $this->createElementFromXML($newnode);
+    }
+    if (is_string($ref)) { 
+      $ref = $this->querySingle($ref);
+    }
+    else if (!$ref) {
+      $ref = $this->documentElement;
+    }
+    $ref->insertBefore($newnode, $ref->firstChild);
+  }
+
+  function prependSibling($newnode, $ref) {
+    if (is_string($newnode)) {
+      $newnode = $this->createElementFromXML($newnode);
+    }
+    if (is_string($ref)) { 
+      $ref = $this->querySingle($ref);
+    }
+    else if (!$ref) {
+      $ref = $this->documentElement;
+    }
+    $ref->parentNode->insertBefore($newnode, $ref);
+  }
+  
+  function appendSibling($newnode, $ref) {
+    if (is_string($newnode)) {
+      $newnode = $this->createElementFromXML($newnode);
+    }
+    if (is_string($ref)) { 
+      $ref = $this->querySingle($ref);
+    }
+    else if (!$ref) {
+      $ref = $this->documentElement;
+    }
+    if ($ref->nextSibling) { 
+      // $ref has an immediate brother : insert newnode before this one 
+      return $ref->parentNode->insertBefore($newnode, $ref->nextSibling); 
+    }
+    else { 
+      // $ref has no brother next to him : insert newnode as last child of his parent 
+      return $ref->parentNode->appendChild($newnode); 
+    } 
+  }
   
   // Give an xpath or an element, return another BetterDOMDocument
   function extract($xpath_or_element, $contextnode = NULL) {
