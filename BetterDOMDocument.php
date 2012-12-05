@@ -225,6 +225,12 @@ class BetterDOMDocument extends DOMDocument {
 
   function querySingle($xpath, $contextnode = NULL) {
     $result = $this->query($xpath, $contextnode);
+    
+    if (!$result) {
+      return NULL;
+      dpm($xpath);
+    }
+    
     if ($result->length) {
       return $result->item(0);
     }
