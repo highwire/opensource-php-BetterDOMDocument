@@ -151,6 +151,9 @@ class BetterDOMDocument extends DOMDocument {
     else if (!$ref) {
       $ref = $this->documentElement;
     }
+    if (!$ref){
+      return FALSE;
+    }
     $ref->insertBefore($newnode, $ref->firstChild);
   }
 
@@ -164,6 +167,10 @@ class BetterDOMDocument extends DOMDocument {
     else if (!$ref) {
       $ref = $this->documentElement;
     }
+    if (!$ref){
+      return FALSE;
+    }
+    
     $ref->parentNode->insertBefore($newnode, $ref);
   }
   
@@ -177,6 +184,10 @@ class BetterDOMDocument extends DOMDocument {
     else if (!$ref) {
       $ref = $this->documentElement;
     }
+    if (!$ref){
+      return FALSE;
+    }
+    
     if ($ref->nextSibling) { 
       // $ref has an immediate brother : insert newnode before this one 
       return $ref->parentNode->insertBefore($newnode, $ref->nextSibling); 
