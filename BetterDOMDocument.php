@@ -297,6 +297,9 @@ class BetterDOMDocument extends DOMDocument {
     if (is_string($replace)) {
       $replace = $this->createElementFromXML($replace);
     }
+    if (!$replace->ownerDocument->documentElement->isSameNode($this->documentElement)) {
+      $replace = $this->importNode($replace, true);
+    }
     $node->parentNode->replaceChild($replace, $node);
     $node = $replace;
   }
