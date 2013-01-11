@@ -279,11 +279,18 @@ class BetterDOMDocument extends DOMDocument {
   
   function asHTML($contextnode = NULL) {
     $xsl = '
-      <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-        <xsl:template match="*">
-        <span class="{translate(name(.),\':\',\'-\')}"><xsl:apply-templates/></span>
-        </xsl:template>
-      </xsl:stylesheet>';
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <xsl:template match="*">
+  <span class="{translate(name(.),\':\',\'-\')}">
+    <xsl:for-each select="./@*">
+      <xsl:attribute name="data-{translate(name(.),\':\',\'-\')}">
+        <xsl:value-of select="." />
+      </xsl:attribute>
+    </xsl:for-each>
+    <xsl:apply-templates/>
+  </span>
+  </xsl:template>
+</xsl:stylesheet>';
     
     $transformed = $this->tranform($xsl, $contextnode);
     return $transformed->out();
