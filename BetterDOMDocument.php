@@ -383,10 +383,6 @@ class BetterDOMDocument extends DOMDocument {
   /*
    * Given a pair of nodes, replace the first with the second
    * 
-   * Note that given caching within libxml, these replacements may not be visible
-   * until you either run flushCache() or output the XML with out(). If you are running
-   * a variety of replacements in series, we highly suggest using queueReplace and runChanges().
-   * 
    * @param mixed $node
    *  Node to be replaced. Can either be an xpath string or a DOMDocument (or even a DOMNode).
    * 
@@ -414,10 +410,6 @@ class BetterDOMDocument extends DOMDocument {
 
   /*
    * Given a node(s), remove / delete them
-   * 
-   * Note that given caching within libxml, these removals may not be visible
-   * until you either run flushCache() or output the XML with out(). If you are running
-   * a variety of removals in series, we highly suggest using queueRemove and runChanges().
    * 
    * @param mixed $node
    *  Can pass a DOMNode, a BetterDOMNodeList, DOMNodeList, an xpath string, or an array of any of these.
