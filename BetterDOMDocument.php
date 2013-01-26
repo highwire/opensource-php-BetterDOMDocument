@@ -109,8 +109,8 @@ class BetterDOMDocument extends DOMDocument {
    *  $context can either be an xpath string, or a DOMElement
    *  Provides context for the xpath query
    * 
-   * @return DOMNodeList
-   *  A list of nodes as a DOMNodeList object
+   * @return BetterDOMNodeList
+   *  A BetterDOMNodeList object, which is very similar to a DOMNodeList, but it iterates in a non-shitty fasion.
    */
   function query($xpath, $context = NULL) {
     $this->createContext($context, 'xpath', FALSE);
@@ -129,10 +129,10 @@ class BetterDOMDocument extends DOMDocument {
       $lookup = array_flip($this->ns);
       $prefix = $lookup[$ns];
       $prepend = str_replace('/', '/'. $prefix . ':', $context->getNodePath());
-      return $xob->query($prepend . $xpath);
+      return new BetterDOMNodeList($xob->query($prepend . $xpath));
     }
     else {
-      return $xob->query($xpath);
+      return new BetterDOMNodeList($xob->query($xpath));
     }
   }
   
@@ -152,15 +152,11 @@ class BetterDOMDocument extends DOMDocument {
   function querySingle($xpath, $context = NULL) {
     $result = $this->query($xpath, $context);
     
-    if (!$result) {
+    if (empty($result) || !count($result)) {
       return FALSE;
-    }
-    
-    if ($result->length) {
-      return $result->item(0);
     }
     else {
-      return FALSE;
+      return $result->item(0);
     }
   }
 
@@ -186,29 +182,39 @@ class BetterDOMDocument extends DOMDocument {
   function getArray($raw = FALSE, $context = NULL) {
     $array = false;
 
-    $this->createContext($context, 'xpath');
-
-    if ($raw == 'full') {
-      $array['#raw'] = $this->saveXML($context);
-    }
-    if ($raw == 'inner') {
-      $array['#raw'] = $this->innerText($context);
-    }
-    if ($context->hasAttributes()) {
-      foreach ($node->attributes as $attr) {
-        $array['@'.$attr->nodeName] = $attr->nodeValue;
+    $this->createContext($context, 'xpath', FALSE);
+    
+    if ($context) {
+      if ($raw == 'full') {
+        $array['#raw'] = $this->saveXML($context);
       }
-    }
-
-    if ($context->hasChildNodes()) {
-      if ($context->childNodes->length == 1 && $context->firstChild->nodeType == XML_TEXT_NODE) {
-        $array['#text'] = $context->firstChild->nodeValue;
+      if ($raw == 'inner') {
+        $array['#raw'] = $this->innerText($context);
       }
-      else {
-        foreach ($context->childNodes as $childNode) {
-          if ($childNode->nodeType == XML_ELEMENT_NODE) {
-            $array[$childNode->nodeName][] = $this->getArray($raw, $childNode);
+      if ($context->hasAttributes()) {
+        foreach ($context->attributes as $attr) {
+          $array['@'.$attr->nodeName] = $attr->nodeValue;
+        }
+      }
+  
+      if ($context->hasChildNodes()) {
+        if ($context->childNodes->length == 1 && $context->firstChild->nodeType == XML_TEXT_NODE) {
+          $array['#text'] = $context->firstChild->nodeValue;
+        }
+        else {
+          foreach ($context->childNodes as $childNode) {
+            if ($childNode->nodeType == XML_ELEMENT_NODE) {
+              $array[$childNode->nodeName][] = $this->getArray($raw, $childNode);
+            }
           }
+        }
+      }
+    }
+    // Else no node was passed, which means we are processing the entire domDocument
+    else {
+      foreach ($this->childNodes as $childNode) {
+        if ($childNode->nodeType == XML_ELEMENT_NODE) {
+          $array[$childNode->nodeName][] = $this->getArray($raw, $childNode);
         }
       }
     }
@@ -243,7 +249,8 @@ class BetterDOMDocument extends DOMDocument {
     //@@TODO: Merge namespaces
     $dom = new BetterDOMDocument($xml, $this->auto_ns);
     if (!$dom->documentElement) {
-      highwire_system_message('BetterDomDocument Error: Invalid XML: ' . $xml, 'error');
+      //print var_dump(debug_backtrace(2));
+      trigger_error('BetterDomDocument Error: Invalid XML: ' . $xml);
     }
     $element = $dom->documentElement;
     return $this->importNode($element, true);
@@ -265,7 +272,7 @@ class BetterDOMDocument extends DOMDocument {
    */
   function append($newnode, $context = NULL) {
     $this->createContext($newnode, 'xml');
-    $this->createContext($context, 'xapth');
+    $this->createContext($context, 'xpath');
     
     if (!$context || !$newnode) {
       return FALSE;
@@ -366,7 +373,7 @@ class BetterDOMDocument extends DOMDocument {
    *  A new BetterDOMDocument created from the xpath or DOMElement
    */
   function extract($node) {
-    $this->createContext($node, 'xapth');
+    $this->createContext($node, 'xpath');
     
     $dom = new BetterDOMDocument($node);
     $dom->ns = $this->ns;
@@ -392,6 +399,10 @@ class BetterDOMDocument extends DOMDocument {
   function replace($node, $replace) {
     $this->createContext($node, 'xpath');
     $this->createContext($replace, 'xml');
+    
+    if (!$node || !$replace) {
+      return FALSE;
+    }
         
     if (!$replace->ownerDocument->documentElement->isSameNode($this->documentElement)) {
       $replace = $this->importNode($replace, true);
@@ -409,18 +420,30 @@ class BetterDOMDocument extends DOMDocument {
    * a variety of removals in series, we highly suggest using queueRemove and runChanges().
    * 
    * @param mixed $node
-   *  Can pass a DOMNode, a DOMNodeList, an xpath string, or an array of any of these.
+   *  Can pass a DOMNode, a BetterDOMNodeList, DOMNodeList, an xpath string, or an array of any of these.
    */
   function remove($node) {
-    $this->createContext($node, 'xpath');
+    // We can't use createContext here because we want to use the entire nodeList (not just a single element)
+    if (is_string($node)) {
+      $node = $this->query($node);
+    }
+    
     if ($node) {
-      if (get_class($node) == 'DOMNodeList' || is_array($node)) {
+      if (is_array($node) || get_class($node) == 'BetterDOMNodeList') {
         foreach($node as $item) {
           $this->remove($item);
         }
       }
+      else if (get_class($node) == 'DOMNodeList') {
+        $this->remove(new BetterDOMNodeList($node));
+      }
       else {
-        $node->parentNode->removeChild($node);
+        $parent = $node->parentNode;
+        $nsuri = $parent->namespaceURI;
+        $parent->removeChild($node);
+        if (!$parent->parentNode) {
+          $parent->namespaceURI = $nsuri;
+        }
       }
     }
   }
@@ -508,16 +531,76 @@ class BetterDOMDocument extends DOMDocument {
   private function createContext(&$context, $type = 'xpath', $createDocument = TRUE) {
     if (!$context && $createDocument) {
       $context = $this->documentElement;
+      return;
     }
     if ($context && is_string($context)) {
       if ($type == 'xpath') {
-        $context = $this->querySingle($contextnode);
+        $context = $this->querySingle($context);
+        return;
       }
       if ($type = 'xml') {
         $context = $this->createElementFromXML($context);
+        return;
       }
     }
   }
   
 }
 
+
+// A BetterDOMNodeList object, which is very similar to a DOMNodeList, but it iterates in a reasonable way.
+// Specifically, replacing or removing a node in the list won't screw up the index.
+class BetterDOMNodeList implements Countable, Iterator {
+  
+  private $array = array();
+  private $position = 0;
+  
+  private $length = 0;
+  
+  function __construct(DOMNodeList $DOMNodeList) {
+    foreach ($DOMNodeList as $item) {
+      $this->array[] = $item;
+    }
+    
+    $this->length = count($this->array);
+    $this->position = 0;
+  }
+  
+  // Provides read-only access to $length
+  function __get ($prop) {
+    if ($prop == 'length') {
+      return $this->length;
+    }
+    else {
+      return null;
+    }
+  }
+
+  function rewind() {
+    $this->position = 0;
+  }
+
+  function current() {
+    return $this->array[$this->position];
+  }
+
+  function key() {
+    return $this->position;
+  }
+
+  function next() {
+    ++$this->position;
+  }
+
+  function valid() {
+    return isset($this->array[$this->position]);
+  }
+  
+  function item($index) {
+    return $this->array[$index];
+  }
+  
+  function count() {
+    return count($this->array);
+  }
+}
