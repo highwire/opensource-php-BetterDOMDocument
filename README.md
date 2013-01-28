@@ -26,7 +26,7 @@ $dom->remove($DomNode);
 $dom->remove('//xpath/to/element/to/remove');
 
 // The same goes for replacments
-$dom->replace('//xpath/to/replace', '<xml>You can pass a <type>string</type>, a <type>DOMNode</type>, or a <type>DOMDocument<type></xml>');
+$dom->replace('//xpath/to/replace', '<xml>You can pass a string, a DOMNode, or a document</xml>');
 
 // It's easy to output the XML
 $xml = $dom->out();
