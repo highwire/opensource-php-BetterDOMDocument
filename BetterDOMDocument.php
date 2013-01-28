@@ -10,6 +10,7 @@ class BetterDOMDocument extends DOMDocument {
 
   private $auto_ns = FALSE;
   public  $ns = array();
+  public  $default_ns = '';
   public  $error_checking = 'strict'; // Can be 'strict', 'warning', 'none' / FALSE
   
   /*
@@ -19,10 +20,12 @@ class BetterDOMDocument extends DOMDocument {
    *  $xml can either be an XML string, a DOMDocument, or a DOMElement. 
    *  You can also pass FALSE or NULL (or omit it) and load XML later using loadXML or loadHTML
    * 
-   * @param bool $auto_register_namespaces 
+   * @param mixed $auto_register_namespaces 
    *  Auto-register namespaces. All namespaces in the root element will be registered for use in xpath queries.
    *  Namespaces that are not declared in the root element will not be auto-registered
-   *  defaults to FALSE
+   *  Defaults to TRUE (Meaning it will auto register all auxiliary namespaces but not the default namespace).
+   *  Pass a prefix string to automatically register the default namespace.
+   *  Pass FALSE to disable auto-namespace registeration
    * 
    * @param bool $error_checking
    *  Can be 'strict', 'warning', or 'none. Defaults to 'strict'.
@@ -30,7 +33,7 @@ class BetterDOMDocument extends DOMDocument {
    *  'warning' is the default behavior in DOMDocument
    *  'strict' corresponds to DOMDocument strictErrorChecking TRUE
    */
-  function __construct($xml = FALSE, $auto_register_namespaces = FALSE, $error_checking = 'strict') {
+  function __construct($xml = FALSE, $auto_register_namespaces = TRUE, $error_checking = 'strict') {
     parent::__construct();
     
     // Check up error-checking
@@ -75,6 +78,12 @@ class BetterDOMDocument extends DOMDocument {
             }
           }
         }
+        
+        // If auto_register_namespaces is a prefix string, then we register the default namespace to that string
+        if (is_string($auto_register_namespaces) && $this->documentElement->getAttribute('xmlns')) {
+          $this->registerNamespace($auto_register_namespaces, $this->documentElement->getAttribute('xmlns'));
+          $this->default_ns = $auto_register_namespaces;
+        }
       }
     }
   }
@@ -114,6 +123,10 @@ class BetterDOMDocument extends DOMDocument {
    */
   function query($xpath, $context = NULL) {
     $this->createContext($context, 'xpath', FALSE);
+
+    if ($context === FALSE) {
+      return FALSE;
+    }
     
     $xob = new DOMXPath($this);
 
@@ -122,17 +135,40 @@ class BetterDOMDocument extends DOMDocument {
       $xob->registerNamespace($namespace, $url);
     }
 
-    // PHP is a piece of shit when it comes to XML namespaces
+    // PHP is a piece of shit when it comes to XML namespaces and contexts
     // Instead of passing the context node, hack the xpath query to manually construct context using xpath
+    // The bug is that DOMXPath requires default-namespaced queries explicitly pass a prefix, whereas getNodePath() does not provide a prefix
+    // if the node is in the default namepspace. This logic works around this bug.
     if ($context) {
-      $ns = $context->namespaceURI;
-      $lookup = array_flip($this->ns);
-      $prefix = $lookup[$ns];
-      $prepend = str_replace('/', '/'. $prefix . ':', $context->getNodePath());
-      return new BetterDOMNodeList($xob->query($prepend . $xpath));
+      $context_query = '';
+      $path_parts = explode('/', $context->getNodePath());
+      foreach ($path_parts as $part) {
+        if ($part) {
+          $context_query .= '/';
+          if (strpos($part, ':')) {
+            $context_query .= $part;
+          }
+          else {
+            if ($this->default_ns) {
+              $context_query .= $this->default_ns . ':' . $part;
+            }
+            else {
+              $context_query .= $part;
+            }
+          }
+        }
+      }
+      $result = $xob->query($context_query . $xpath);
     }
     else {
-      return new BetterDOMNodeList($xob->query($xpath));
+      $result = $xob->query($xpath);
+    }
+
+    if ($result) {
+      return new BetterDOMNodeList($result);
+    }
+    else {
+      return FALSE;
     }
   }
   
@@ -165,6 +201,40 @@ class BetterDOMDocument extends DOMDocument {
    */
   function query_single($xpath, $context = NULL) {
     return $this->querySingle($xpath, $context);
+  }
+
+  /*
+   * Given a CSS selector, get a list of nodes.
+   * 
+   * @param string $selector
+   *  CSS selector to be used
+   * 
+   * @param mixed $context
+   *  $context can either be an xpath string, or a DOMElement
+   *  Provides context for the CSS selector
+   * 
+   * @return BetterDOMNodeList
+   *  A BetterDOMNodeList object, which is very similar to a DOMNodeList, but it iterates in a non-shitty fasion.
+   */  
+  function select($selector, $context = null) {
+    return $this->query($this->transformCSS($selector), $context);
+  }
+
+  /*
+   * Given a CSS Selector, get a single node (first one found)
+   * 
+   * @param string $selector
+   *  CSS selector
+   * 
+   * @param mixed $context
+   *  $context can either be an xpath string, or a DOMElement
+   *  Provides context for the CSS selector
+   * 
+   * @return mixed
+   *  The first node found by the CSS selector
+   */
+  function selectSingle($selector) {
+    return $this->querySingle($this->transformCSS($selector), $context);
   }
 
   /*
@@ -246,13 +316,17 @@ class BetterDOMDocument extends DOMDocument {
    *  XML string to import
    */
   function createElementFromXML($xml) {
-    //@@TODO: Merge namespaces
     $dom = new BetterDOMDocument($xml, $this->auto_ns);
     if (!$dom->documentElement) {
-      //print var_dump(debug_backtrace(2));
       trigger_error('BetterDomDocument Error: Invalid XML: ' . $xml);
     }
     $element = $dom->documentElement;
+    
+    // Merge the namespaces
+    foreach ($dom->getNamespaces() as $prefix => $url) {
+      $this->registerNamespace($prefix, $url);
+    }
+    
     return $this->importNode($element, true);
   }
 
@@ -535,6 +609,107 @@ class BetterDOMDocument extends DOMDocument {
         return;
       }
     }
+  }
+  
+  // Turns CSS selector in to xpath
+  private function transformCSS($path) {
+    $path = (string) $path;
+    
+    if (strstr($path, ',')) {
+      $paths       = explode(',', $path);
+      $expressions = array();
+      foreach ($paths as $path) {
+        $xpath = self::transform(trim($path));
+        if (is_string($xpath)) {
+          $expressions[] = $xpath;
+        }
+        else if (is_array($xpath)) {
+          $expressions = array_merge($expressions, $xpath);
+        }
+      }
+      return implode('|', $expressions);
+    }
+
+    $paths    = array('//');
+    $path     = preg_replace('|\s+>\s+|', '>', $path);
+    $segments = preg_split('/\s+/', $path);
+    foreach ($segments as $key => $segment) {
+      $pathSegment = $this->transformCSSTokenize($segment);
+      if (0 == $key) {
+        if (0 === strpos($pathSegment, '[contains(')) {
+          $paths[0] .= '*' . ltrim($pathSegment, '*');
+        }
+        else {
+          $paths[0] .= $pathSegment;
+        }
+        continue;
+      }
+      if (0 === strpos($pathSegment, '[contains(')) {
+        foreach ($paths as $pathKey => $xpath) {
+          $paths[$pathKey] .= '//*' . ltrim($pathSegment, '*');
+          $paths[] = $xpath . $pathSegment;
+        }
+      }
+      else {
+        foreach ($paths as $pathKey => $xpath) {
+          $paths[$pathKey] .= '//' . $pathSegment;
+        }
+      }
+    }
+
+    if (1 == count($paths)) {
+      return $paths[0];
+    }
+    
+    return implode('|', $paths);
+  }
+  
+  private function transformCSSTokenize($expression) {
+    // Child selectors
+    $expression = str_replace('>', '/', $expression);
+
+    // IDs
+    $expression = preg_replace('|#([a-z][a-z0-9_-]*)|i', '[@id=\'$1\']', $expression);
+    $expression = preg_replace('|(?<![a-z0-9_-])(\[@id=)|i', '*$1', $expression);
+
+    // arbitrary attribute strict equality
+    $expression = preg_replace_callback(
+      '|\[([a-z0-9_-]+)=[\'"]([^\'"]+)[\'"]\]|i',
+      function ($matches) {
+        return '[@' . strtolower($matches[1]) . "='" . $matches[2] . "']";
+      },
+      $expression
+    );
+
+    // arbitrary attribute contains full word
+    $expression = preg_replace_callback(
+      '|\[([a-z0-9_-]+)~=[\'"]([^\'"]+)[\'"]\]|i',
+      function ($matches) {
+        return "[contains(concat(' ', normalize-space(@" . strtolower($matches[1]) . "), ' '), ' " . $matches[2] . " ')]";
+      },
+      $expression
+    );
+
+    // arbitrary attribute contains specified content
+    $expression = preg_replace_callback(
+      '|\[([a-z0-9_-]+)\*=[\'"]([^\'"]+)[\'"]\]|i',
+      function ($matches) {
+        return "[contains(@" . strtolower($matches[1]) . ", '" . $matches[2] . "')]";
+      },
+      $expression
+    );
+
+    // Classes
+    $expression = preg_replace(
+      '|\.([a-z][a-z0-9_-]*)|i',
+      "[contains(concat(' ', normalize-space(@class), ' '), ' \$1 ')]",
+      $expression
+    );
+
+    /** ZF-9764 -- remove double asterisk */
+    $expression = str_replace('**', '*', $expression);
+
+    return $expression;
   }
   
 }
