@@ -1,5 +1,5 @@
 BetterDOMDocument is a handy PHP utility class for working with XML. It's a wrapper for PHP's built in DOMDocument that provides a bunch of nice shortcuts that
-makes working with XML in PHP a breeze.
+makes working with XML in PHP a breeze. It has great built-in support for namespaces, xpath, and CSS selectors.
 
 ```php
 <?php
@@ -57,3 +57,7 @@ $surname = $dom->querySingle('//atom:author/nlm:name/nlm:surname')->nodeValue;
 // If you need to register another namespace before doing a query, thats a snap.
 // Note that by default all namespace declarations in the root element are automatically registered. 
 $dom->registerNamespace('kml','http://www.opengis.net/kml/2.2');
+
+// If you want to query with CSS selectors, no problem!
+$dom->select('nlm:name[@ame-style="eastern"]');
+
