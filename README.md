@@ -8,7 +8,7 @@ makes working with XML in PHP a breeze. It has great built-in support for namesp
 $dom = new BetterDOMDocument($xmlstring);
 
 // It's easy to output the entire document as an array, which is sometimes easier to work with in PHP
-$array = dom->getArray();
+$array = $dom->getArray();
 
 // It's easy to query too!
 $node_list = $dom->query('//xpath/to/node', $optional_context_node);
@@ -59,5 +59,5 @@ $surname = $dom->querySingle('//atom:author/nlm:name/nlm:surname')->nodeValue;
 $dom->registerNamespace('kml','http://www.opengis.net/kml/2.2');
 
 // If you want to query with CSS selectors, no problem!
-$dom->select('nlm:name[@ame-style="eastern"]');
+$dom->select('nlm:name[@name-style="eastern"]');
 
