@@ -57,6 +57,13 @@ class BetterDOMDocument extends DOMDocument {
           $this->appendChild($this->importNode($xml->documentElement, true));
         }
       }
+      if ($class == 'BetterDOMDocument') {
+        if ($xml->documentElement) {
+          $this->appendChild($this->importNode($xml->documentElement, true));
+        }
+        $this->ns = $xml->ns;
+        $this->default_ns = $xml->default_ns;
+      }
     }
 
     if ($xml && is_string($xml)) {
@@ -134,7 +141,7 @@ class BetterDOMDocument extends DOMDocument {
     foreach ($this->ns as $namespace => $url) {
       $xob->registerNamespace($namespace, $url);
     }
-
+    
     // PHP is a piece of shit when it comes to XML namespaces and contexts
     // Instead of passing the context node, hack the xpath query to manually construct context using xpath
     // The bug is that DOMXPath requires default-namespaced queries explicitly pass a prefix, whereas getNodePath() does not provide a prefix
@@ -764,7 +771,10 @@ class BetterDOMNodeList implements Countable, Iterator {
   }
   
   function item($index) {
-    return $this->array[$index];
+    if (isset($this->array[$index])) {
+      return $this->array[$index];
+    }
+    else return FALSE;
   }
   
   function count() {
