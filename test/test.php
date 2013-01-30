@@ -2,6 +2,14 @@
 
 include_once('../BetterDOMDocument.php');
 
+
+$xml = '<nlm:contrib xmlns:nlm="http://schema.highwire.org/NLM/Journal" contrib-type="author"><nlm:string-name nlm:test="123">Patrick Douglas Hayes</nlm:string-name></nlm:contrib>';
+
+$dom = new BetterDOMDocument($xml, 'nlm');
+print var_dump($dom->query('//*:test'));
+
+exit;
+
 $xml = '<?xml version="1.0"?><!-- This is a comment -->
 <atom:author test="123" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:nlm="http://schema.highwire.org/NLM/Journal" xmlns:hwp="http://schema.highwire.org/Journal" nlm:contrib-type="author">
 <atom:name>Shubhayan Sanatani</atom:name>

@@ -323,6 +323,24 @@ class BetterDOMDocument extends DOMDocument {
    *  XML string to import
    */
   function createElementFromXML($xml) {
+    
+    // To make thing easy and make sure namespaces work properly, we add the root namespace delcarations if it is not declared
+    $namespaces = $this->ns;
+    $xml = preg_replace_callback('/<[^\?^!].+?>/s', function($root_match) use ($namespaces) {
+      preg_match('/<([^ <>]+)[\d\s]?.*?>/s', $root_match[0], $root_tag);
+      $new_root = $root_tag[1];
+      if (strpos($new_root, ':')) {
+        $parts = explode(':', $new_root);
+        $prefix = $parts[0]; 
+        if (isset($namespaces[$prefix])) {
+          if (!strpos($root_match[0], "xmlns:$prefix")) {
+            $new_root .= " xmlns:$prefix='" . $namespaces[$prefix] . "'";             
+          }
+        }
+      }
+      return str_replace($root_tag[1], $new_root, $root_match[0]);
+    }, $xml, 1);
+    
     $dom = new BetterDOMDocument($xml, $this->auto_ns);
     if (!$dom->documentElement) {
       trigger_error('BetterDomDocument Error: Invalid XML: ' . $xml);
