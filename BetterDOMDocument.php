@@ -71,6 +71,7 @@ class BetterDOMDocument extends DOMDocument {
         @$this->loadXML($xml);
       }
       else {
+        //trigger_error(htmlspecialchars($xml), E_USER_WARNING);
         $this->loadXML($xml);
       }
 
@@ -445,8 +446,8 @@ class BetterDOMDocument extends DOMDocument {
    *  then you should replace your DOMElement with the returned one.
    */
   function appendSibling($newnode, $context) {
-    $this->createConext($newnode, 'xml');
-    $this->createConext($context, 'xpath');
+    $this->createContext($newnode, 'xml');
+    $this->createContext($context, 'xpath');
     
     if (!$context){
       return FALSE;
