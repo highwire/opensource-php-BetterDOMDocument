@@ -173,7 +173,7 @@ class BetterDOMDocument extends DOMDocument {
     }
 
     if ($result) {
-      return new BetterDOMNodeList($result);
+      return new BetterDOMNodeList($result, $this);
     }
     else {
       return FALSE;
@@ -527,7 +527,7 @@ class BetterDOMDocument extends DOMDocument {
         }
       }
       else if (get_class($node) == 'DOMNodeList') {
-        $this->remove(new BetterDOMNodeList($node));
+        $this->remove(new BetterDOMNodeList($node, $this));
       }
       else {
         $parent = $node->parentNode;
@@ -749,20 +749,25 @@ class BetterDOMNodeList implements Countable, Iterator {
   private $position = 0;
   
   private $length = 0;
+  private $dom;
   
-  function __construct(DOMNodeList $DOMNodeList) {
+  function __construct(DOMNodeList $DOMNodeList, BetterDOMDocument $dom) {
     foreach ($DOMNodeList as $item) {
       $this->array[] = $item;
     }
     
+    $this->dom = $dom;
     $this->length = count($this->array);
     $this->position = 0;
   }
   
-  // Provides read-only access to $length
+  // Provides read-only access to $length and $dom
   function __get ($prop) {
     if ($prop == 'length') {
       return $this->length;
+    }
+    else if ($prop == 'dom') {
+      return $this->dom;
     }
     else {
       return null;
