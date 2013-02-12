@@ -71,7 +71,7 @@ class BetterDOMDocument extends DOMDocument {
         @$this->loadXML($xml);
       }
       else {
-        //trigger_error(htmlspecialchars($xml), E_USER_WARNING);
+        #trigger_error(htmlspecialchars($xml), E_USER_WARNING);
         $this->loadXML($xml);
       }
 
@@ -472,10 +472,9 @@ class BetterDOMDocument extends DOMDocument {
    * @return BetterDOMDocument
    *  A new BetterDOMDocument created from the xpath or DOMElement
    */
-  function extract($node) {
+  function extract($node, $auto_register_namespaces = TRUE, $error_checking = 'none') {
     $this->createContext($node, 'xpath');
-    
-    $dom = new BetterDOMDocument($node);
+    $dom = new BetterDOMDocument($node, $auto_register_namespaces, $error_checking);
     $dom->ns = $this->ns;
     return $dom;
   }
