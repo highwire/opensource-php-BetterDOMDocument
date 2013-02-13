@@ -284,6 +284,9 @@ class BetterDOMDocument extends DOMDocument {
             if ($childNode->nodeType == XML_ELEMENT_NODE) {
               $array[$childNode->nodeName][] = $this->getArray($raw, $childNode);
             }
+            elseif ($childNode->nodeType == XML_CDATA_SECTION_NODE) {
+              $array['#text'] = $childNode->textContent;
+            }
           }
         }
       }
