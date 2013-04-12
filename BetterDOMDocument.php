@@ -71,8 +71,9 @@ class BetterDOMDocument extends DOMDocument {
         @$this->loadXML($xml);
       }
       else {
-        #trigger_error(htmlspecialchars($xml), E_USER_WARNING);
-        $this->loadXML($xml);
+        if (!$this->loadXML($xml)) {
+          trigger_error('BetterDOMDocument: Could not load: ' . htmlspecialchars($xml), E_USER_WARNING);
+        }
       }
 
       // There is no way in DOMDocument to auto-detect or list namespaces.
@@ -283,6 +284,9 @@ class BetterDOMDocument extends DOMDocument {
           foreach ($context->childNodes as $childNode) {
             if ($childNode->nodeType == XML_ELEMENT_NODE) {
               $array[$childNode->nodeName][] = $this->getArray($raw, $childNode);
+            }
+            elseif ($childNode->nodeType == XML_CDATA_SECTION_NODE) {
+              $array['#text'] = $childNode->textContent;
             }
           }
         }
@@ -615,6 +619,10 @@ class BetterDOMDocument extends DOMDocument {
     if (!$context) {
       return '';
     }
+
+    foreach ($this->ns as $prefix => $namespace) {
+      $context->setAttribute('xmlns:' . $prefix, $namespace);
+    }
     
     return $this->saveXML($context, LIBXML_NOEMPTYTAG);
   }
@@ -633,6 +641,12 @@ class BetterDOMDocument extends DOMDocument {
         $context = $this->createElementFromXML($context);
         return;
       }
+    }
+    if (is_a($context, 'DOMElement')) {
+      return $context;
+    }
+    if (is_a($context, 'DOMDocument')) {
+      return $context->documentElement;
     }
   }
   
