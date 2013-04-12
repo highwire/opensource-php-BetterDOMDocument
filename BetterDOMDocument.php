@@ -632,6 +632,11 @@ class BetterDOMDocument extends DOMDocument {
       $context = $this->documentElement;
       return;
     }
+
+    if (!$context) {
+      return FALSE;
+    }
+
     if ($context && is_string($context)) {
       if ($type == 'xpath') {
         $context = $this->querySingle($context);
@@ -642,11 +647,14 @@ class BetterDOMDocument extends DOMDocument {
         return;
       }
     }
-    if (is_a($context, 'DOMElement')) {
-      return $context;
-    }
-    if (is_a($context, 'DOMDocument')) {
-      return $context->documentElement;
+    
+    if (is_object($context)) {
+      if (is_a($context, 'DOMElement')) {
+        return $context;
+      }
+      if (is_a($context, 'DOMDocument')) {
+        return $context->documentElement;
+      }
     }
   }
   
