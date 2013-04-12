@@ -620,8 +620,14 @@ class BetterDOMDocument extends DOMDocument {
       return '';
     }
 
+    // Copy namespace prefixes
+    if ($this->default_ns && !$context->hasAttribute('xmlns')) {
+      $context->setAttribute('xmlns', $namespace);
+    }
     foreach ($this->ns as $prefix => $namespace) {
-      $context->setAttribute('xmlns:' . $prefix, $namespace);
+      if (!$context->hasAttribute('xmlns:' . $prefix)) {
+        $context->setAttribute('xmlns:' . $prefix, $namespace);
+      }
     }
     
     return $this->saveXML($context, LIBXML_NOEMPTYTAG);
@@ -647,7 +653,7 @@ class BetterDOMDocument extends DOMDocument {
         return;
       }
     }
-    
+
     if (is_object($context)) {
       if (is_a($context, 'DOMElement')) {
         return $context;
