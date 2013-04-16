@@ -100,14 +100,14 @@ class BetterDOMDocument extends DOMDocument {
   /*
    * Register a namespace to be used in xpath queries
    *
-   * @param string $namespace
+   * @param string $prefix
    *  Namespace prefix to register
    *
    * @param string $url
    *  Connonical URL for this namespace prefix
    */
-  function registerNamespace($namespace, $url) {
-    $this->ns[$namespace] = $url;
+  function registerNamespace($prefix, $url) {
+    $this->ns[$prefix] = $url;
   }
 
   /*
@@ -115,6 +115,16 @@ class BetterDOMDocument extends DOMDocument {
    */
   function getNamespaces() {
     return $this->ns;
+  }
+
+  /*
+   * Given a namespace URL, get the prefix
+   * 
+   * @param string $url
+   *  Connonical URL for this namespace prefix
+   */
+  function lookupPrefix($url) {
+    return array_search($url, $this->ns);
   }
 
   /*
@@ -151,6 +161,13 @@ class BetterDOMDocument extends DOMDocument {
     if ($context) {
       $context_query = '';
       $path_parts = explode('/', $context->getNodePath());
+      if ($context->namespaceURI) {
+        $prefix = $this->lookupPrefix($context->namespaceURI);
+      }
+      else {
+        $prefix = FALSE;
+      }
+
       foreach ($path_parts as $part) {
         if ($part) {
           $context_query .= '/';
@@ -158,8 +175,8 @@ class BetterDOMDocument extends DOMDocument {
             $context_query .= $part;
           }
           else {
-            if ($this->default_ns) {
-              $context_query .= $this->default_ns . ':' . $part;
+            if ($prefix) {
+              $context_query .= $prefix . ':' . $part;
             }
             else {
               $context_query .= $part;
