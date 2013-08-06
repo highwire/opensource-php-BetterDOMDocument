@@ -159,31 +159,25 @@ class BetterDOMDocument extends DOMDocument {
     // The bug is that DOMXPath requires default-namespaced queries explicitly pass a prefix, whereas getNodePath() does not provide a prefix
     // if the node is in the default namepspace. This logic works around this bug.
     if ($context) {
-      $context_query = '';
-      $path_parts = explode('/', $context->getNodePath());
-      if ($context->namespaceURI) {
-        $prefix = $this->lookupPrefix($context->namespaceURI);
+      $raw_path_parts = $context->getNodePath();
+
+      // Either there are no namespaces available, or namespaces have been properly built in the path
+      if (!$context->namespaceURI || strpos($raw_path_parts, ':')) {
+        $context_query = $raw_path_parts;
       }
       else {
-        $prefix = FALSE;
-      }
-
-      foreach ($path_parts as $part) {
-        if ($part) {
-          $context_query .= '/';
-          if (strpos($part, ':')) {
-            $context_query .= $part;
-          }
-          else {
-            if ($prefix) {
-              $context_query .= $prefix . ':' . $part;
-            }
-            else {
-              $context_query .= $part;
-            }
+        // There's no namespaces in the query string, but the context is namespaced. 
+        // This is a bug in DOMDocument (surprise surprise), we need to try to manually construct the path.
+        $prefix = $this->lookupPrefix($context->namespaceURI);
+        $context_query = '';
+        $path_parts = explode('/', $raw_path_parts);
+        foreach ($path_parts as $part) {
+          if ($part) {
+            $context_query .= $prefix . ':' . $part;
           }
         }
       }
+
       $result = $xob->query($context_query . $xpath);
     }
     else {
