@@ -141,6 +141,14 @@ class BetterDOMDocument extends DOMDocument {
    *  A BetterDOMNodeList object, which is very similar to a DOMNodeList, but it iterates in a non-shitty fasion.
    */
   function query($xpath, $context = NULL) {
+
+    // Special xpath extension - allow querying by class by using the '.' operator
+    if (strpos($xpath, '.') !== FALSE) {
+      $xpath = preg_replace_callback("|[^\\/\[\]]*\.[^\\/\[\]]*|", "BetterDOMDocument::ClassSelectorTransform", $xpath);
+    }
+
+    dpm($xpath);
+
     $this->createContext($context, 'xpath', FALSE);
 
     if ($context === FALSE) {
@@ -190,6 +198,22 @@ class BetterDOMDocument extends DOMDocument {
     else {
       return FALSE;
     }
+  }
+
+  function ClassSelectorTransform($matches) {
+    $parts = explode('.', $matches[0]);
+    $element = array_shift($parts);
+
+    $output = $element . '[';
+    foreach ($parts as $i => $part) {
+      $output .= "contains(@class, '$part')";
+      if ($i != count($parts) -1) {
+        $output .= " or ";
+      }
+    }
+    $output .= "]";
+
+    return $output;
   }
   
   /*
