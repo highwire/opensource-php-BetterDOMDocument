@@ -147,8 +147,6 @@ class BetterDOMDocument extends DOMDocument {
       $xpath = preg_replace_callback("|[^\\/\[\]]*\.[^\\/\[\]]*|", "BetterDOMDocument::ClassSelectorTransform", $xpath);
     }
 
-    dpm($xpath);
-
     $this->createContext($context, 'xpath', FALSE);
 
     if ($context === FALSE) {
@@ -200,6 +198,11 @@ class BetterDOMDocument extends DOMDocument {
     }
   }
 
+  /*
+   * Callback for preg_replace_callback
+   * 
+   * Replace all instances of "div.foo" with a selector that will select on class
+   */
   function ClassSelectorTransform($matches) {
     $parts = explode('.', $matches[0]);
     $element = array_shift($parts);
