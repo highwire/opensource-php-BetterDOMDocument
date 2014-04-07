@@ -141,12 +141,6 @@ class BetterDOMDocument extends DOMDocument {
    *  A BetterDOMNodeList object, which is very similar to a DOMNodeList, but it iterates in a non-shitty fasion.
    */
   function query($xpath, $context = NULL) {
-
-    // Special xpath extension - allow querying by class by using the '.' operator
-    if (strpos($xpath, '.') !== FALSE) {
-      $xpath = preg_replace_callback("|[^\\/\[\]]*\.[^\\/\[\]]*|", "BetterDOMDocument::ClassSelectorTransform", $xpath);
-    }
-
     $this->createContext($context, 'xpath', FALSE);
 
     if ($context === FALSE) {
