@@ -122,9 +122,30 @@ class BetterDOMDocument extends DOMDocument {
    * 
    * @param string $url
    *  Connonical URL for this namespace prefix
+   * 
+   * @return string
+   *  The namespace prefix or FALSE if there is no namespace with that URL
    */
   function lookupPrefix($url) {
     return array_search($url, $this->ns);
+  }
+
+  /*
+   * Given a namespace prefix, get the URL
+   * 
+   * @param string $prefix
+   *  namespace prefix
+   * 
+   * return string
+   *  The namespace URL or FALSE if there is no namespace with that prefix
+   */
+  function lookupURL($prefix) {
+    if (isset($this->ns[$prefix])) {
+      return $this->ns[$prefix];
+    }
+    else {
+      return FALSE;
+    }
   }
 
   /*
@@ -603,6 +624,51 @@ class BetterDOMDocument extends DOMDocument {
     $xslt->importStylesheet($xslDoc);
     
     return new BetterDomDocument($xslt->transformToDoc($doc));
+  }
+
+  /*
+   * Given a node, change it's namespace to the specified namespace in situ
+   * 
+   * @param mixed $node
+   *  Node to be changed. Can either be an xpath string or a DOMElement.
+   * 
+   * @param mixed $replace
+   *  Replace $node with $replace. Replace can be an XML string, or a DOMNode
+   * 
+   * @return the changed node
+   *   The node with the new namespace. The node will also be changed in-situ in the document as well.
+   */
+  function changeNamespace($node, $prefix, $url) {
+    $this->createContext($node, 'xpath');
+    
+    if (!$node) {
+      return FALSE;
+    }
+    
+    $this->registerNamespace($prefix, $url);
+
+    if (get_class($node) == 'DOMElement') {
+      $elemname = array_pop(explode(':', $node->tagName));
+
+      $replace = DOMDocument::createElementNS($url, $prefix . ':' . $elemname);
+
+      $xsl = '
+        <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+          <xsl:template match="*">
+            <xsl:element name="' . $prefix . ':{local-name()}" namespace="' . $url . '">
+             <xsl:copy-of select="@*"/>
+             <xsl:apply-templates/>
+            </xsl:element>
+          </xsl:template>
+        </xsl:stylesheet>';
+
+      $transformed = $this->tranform($xsl, $node);
+      return $this->replace($node, $transformed->documentElement);   
+    }
+    else {
+      // @@TODO: Report the correct calling file and number
+      throw new Exception("Changing the namespace of a " . get_class($node) . " is not supported");
+    }
   }
 
   /*
