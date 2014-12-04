@@ -148,8 +148,77 @@ class BetterDOMDocument extends DOMDocument {
     }
   }
 
+
   /*
    * Given an xpath, get a list of nodes.
+   * 
+   * @param string $xpath
+   *  xpath to be used for query
+   * 
+   * @param mixed $context
+   *  $context can either be an xpath string, or a DOMElement
+   *  Provides context for the xpath query
+   * 
+   * @return BetterDOMNodeList
+   *  A BetterDOMNodeList object, which is very similar to a DOMNodeList, but it iterates in a non-shitty fasion.
+   */
+  function xpath($xpath, $context = NULL) {
+    $this->createContext($context, 'xpath', FALSE);
+
+    if ($context === FALSE) {
+      return FALSE;
+    }
+    
+    $xob = new DOMXPath($this);
+
+    // Register the namespaces
+    foreach ($this->ns as $namespace => $url) {
+      $xob->registerNamespace($namespace, $url);
+    }
+
+    if ($context) {
+      $result = $xob->query($xpath, $context);
+    }
+    else {
+      $result = $xob->query($xpath);
+    }
+
+    if ($result) {
+      return new BetterDOMNodeList($result, $this);
+    }
+    else {
+      return FALSE;
+    }
+  }
+
+
+  /*
+   * Given an xpath, a single node (first one found)
+   * 
+   * @param string $xpath
+   *  xpath to be used for query
+   * 
+   * @param mixed $context
+   *  $context can either be an xpath string, or a DOMElement
+   *  Provides context for the xpath query
+   * 
+   * @return mixed
+   *  The first node found by the xpath query
+   */
+  function xpathSingle($xpath, $context = NULL) {
+    $result = $this->xpath($xpath, $context);
+    
+    if (empty($result) || !count($result)) {
+      return FALSE;
+    }
+    else {
+      return $result->item(0);
+    }
+  }
+
+
+  /*
+   * DEPRECATED - USE xpath() . Given an xpath, get a list of nodes.
    * 
    * @param string $xpath
    *  xpath to be used for query
@@ -174,8 +243,7 @@ class BetterDOMDocument extends DOMDocument {
     foreach ($this->ns as $namespace => $url) {
       $xob->registerNamespace($namespace, $url);
     }
-    
-    // PHP is a piece of shit when it comes to XML namespaces and contexts
+
     // Instead of passing the context node, hack the xpath query to manually construct context using xpath
     // The bug is that DOMXPath requires default-namespaced queries explicitly pass a prefix, whereas getNodePath() does not provide a prefix
     // if the node is in the default namepspace. This logic works around this bug.
@@ -235,7 +303,7 @@ class BetterDOMDocument extends DOMDocument {
   }
   
   /*
-   * Given an xpath, a single node (first one found)
+   * DEPRECATED - use xpathSingle(). Given an xpath, a single node (first one found)
    * 
    * @param string $xpath
    *  xpath to be used for query
