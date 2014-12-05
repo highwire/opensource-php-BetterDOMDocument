@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/highwire/opensource-php-BetterDOMDocument.svg?branch=master)](https://travis-ci.org/highwire/opensource-php-BetterDOMDocument)
+
 BetterDOMDocument is a handy PHP utility class for working with XML. It's a wrapper for PHP's built in DOMDocument that provides a bunch of nice shortcuts that
 makes working with XML in PHP a breeze. It has great built-in support for namespaces, xpath, and CSS selectors.
 
