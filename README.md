@@ -13,10 +13,10 @@ $dom = new BetterDOMDocument($xmlstring);
 $array = $dom->getArray();
 
 // It's easy to query too!
-$node_list = $dom->query('//xpath/to/node', $optional_context_node);
+$node_list = $dom->xpath('//xpath/to/node', $optional_context_node);
 
 // If you know you're only going to find a single DOMNode, you can use a querySingle
-$dom_node = $dom->querySingle('//xpath/to/node');
+$dom_node = $dom->xpathSingle('//xpath/to/node');
 
 // Swapping out DOMNodes is really easy
 $dom->replace($DomNode, $replacementNode);
