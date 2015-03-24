@@ -13,7 +13,7 @@ class BetterDOMDocument extends DOMDocument {
   public  $default_ns = '';
   public  $error_checking = 'strict'; // Can be 'strict', 'warning', 'none' / FALSE
   
-  /*
+  /**
    * Create a new BetterDOMDocument
    *
    * @param mixed $xml
@@ -97,7 +97,7 @@ class BetterDOMDocument extends DOMDocument {
     }
   }
 
-  /*
+  /**
    * Register a namespace to be used in xpath queries
    *
    * @param string $prefix
@@ -110,14 +110,14 @@ class BetterDOMDocument extends DOMDocument {
     $this->ns[$prefix] = $url;
   }
 
-  /*
+  /**
    * Get the list of registered namespaces as an array
    */
   function getNamespaces() {
     return $this->ns;
   }
 
-  /*
+  /**
    * Given a namespace URL, get the prefix
    * 
    * @param string $url
@@ -130,7 +130,7 @@ class BetterDOMDocument extends DOMDocument {
     return array_search($url, $this->ns);
   }
 
-  /*
+  /**
    * Given a namespace prefix, get the URL
    * 
    * @param string $prefix
@@ -149,7 +149,7 @@ class BetterDOMDocument extends DOMDocument {
   }
 
 
-  /*
+  /**
    * Given an xpath, get a list of nodes.
    * 
    * @param string $xpath
@@ -192,8 +192,8 @@ class BetterDOMDocument extends DOMDocument {
   }
 
 
-  /*
-   * Given an xpath, a single node (first one found)
+  /**
+   * Given an xpath, get a single node (first one found)
    * 
    * @param string $xpath
    *  xpath to be used for query
@@ -217,7 +217,7 @@ class BetterDOMDocument extends DOMDocument {
   }
 
 
-  /*
+  /**
    * DEPRECATED - USE xpath() . Given an xpath, get a list of nodes.
    * 
    * @param string $xpath
@@ -281,7 +281,7 @@ class BetterDOMDocument extends DOMDocument {
     }
   }
 
-  /*
+  /**
    * Callback for preg_replace_callback
    * 
    * Replace all instances of "div.foo" with a selector that will select on class
@@ -302,7 +302,7 @@ class BetterDOMDocument extends DOMDocument {
     return $output;
   }
   
-  /*
+  /**
    * DEPRECATED - use xpathSingle(). Given an xpath, a single node (first one found)
    * 
    * @param string $xpath
@@ -326,14 +326,14 @@ class BetterDOMDocument extends DOMDocument {
     }
   }
 
-  /*
+  /**
    * Alias for querySingle for backwards compatibility
    */
   function query_single($xpath, $context = NULL) {
     return $this->querySingle($xpath, $context);
   }
 
-  /*
+  /**
    * Given a CSS selector, get a list of nodes.
    * 
    * @param string $selector
@@ -350,7 +350,7 @@ class BetterDOMDocument extends DOMDocument {
     return $this->query($this->transformCSS($selector), $context);
   }
 
-  /*
+  /**
    * Given a CSS Selector, get a single node (first one found)
    * 
    * @param string $selector
@@ -367,7 +367,7 @@ class BetterDOMDocument extends DOMDocument {
     return $this->querySingle($this->transformCSS($selector), $context);
   }
 
-  /*
+  /**
    * Get the document (or an element) as an array
    *
    * @param string $raw
@@ -425,7 +425,7 @@ class BetterDOMDocument extends DOMDocument {
     return $array;
   }
   
-  /*
+  /**
    * Get the inner text of an element
    * 
    * @param mixed $context 
@@ -440,7 +440,7 @@ class BetterDOMDocument extends DOMDocument {
     return $matches[1];
   }
 
-  /*
+  /**
    * Create an DOMElement from XML and attach it to the DOMDocument
    * 
    * Note that this does not place it anywhere in the dom tree, it merely imports it.
@@ -481,7 +481,7 @@ class BetterDOMDocument extends DOMDocument {
     return $this->importNode($element, true);
   }
 
-  /*
+  /**
    * Append a child to the context node, make it the last child
    * 
    * @param mixed $newnode
@@ -506,7 +506,7 @@ class BetterDOMDocument extends DOMDocument {
     return $context->appendChild($newnode);
   }
   
-  /*
+  /**
    * Append a child to the context node, make it the first child
    * 
    * @param mixed $newnode
@@ -531,7 +531,7 @@ class BetterDOMDocument extends DOMDocument {
     return $context->insertBefore($newnode, $context->firstChild);
   }
 
-  /*
+  /**
    * Prepend a sibling to the context node, put it just before the context node
    * 
    * @param mixed $newnode
@@ -556,7 +556,7 @@ class BetterDOMDocument extends DOMDocument {
     return $context->parentNode->insertBefore($newnode, $context);
   }
   
-  /*
+  /**
    * Append a sibling to the context node, put it just after the context node
    * 
    * @param mixed $newnode
@@ -588,7 +588,7 @@ class BetterDOMDocument extends DOMDocument {
     }
   }
   
-  /*
+  /**
    * Given an xpath or DOMElement, return a new BetterDOMDocument.
    * 
    * @param mixed $node
@@ -604,7 +604,7 @@ class BetterDOMDocument extends DOMDocument {
     return $dom;
   }
   
-  /*
+  /**
    * Given a pair of nodes, replace the first with the second
    * 
    * @param mixed $node
@@ -632,7 +632,7 @@ class BetterDOMDocument extends DOMDocument {
     return $node;
   }
 
-  /*
+  /**
    * Given a node(s), remove / delete them
    * 
    * @param mixed $node
@@ -664,7 +664,7 @@ class BetterDOMDocument extends DOMDocument {
     }
   }
   
-  /*
+  /**
    * Given an XSL string, transform the BetterDOMDocument (or a passed context node)
    * 
    * @param string $xsl
@@ -694,7 +694,7 @@ class BetterDOMDocument extends DOMDocument {
     return new BetterDomDocument($xslt->transformToDoc($doc));
   }
 
-  /*
+  /**
    * Given a node, change it's namespace to the specified namespace in situ
    * 
    * @param mixed $node
@@ -739,7 +739,7 @@ class BetterDOMDocument extends DOMDocument {
     }
   }
 
-  /*
+  /**
    * Get a lossless HTML representation of the XML
    *
    * Transforms the document (or passed context) into a set of HTML spans.
@@ -771,7 +771,7 @@ class BetterDOMDocument extends DOMDocument {
     return $transformed->out();
   }
 
-  /*
+  /**
    * Output the BetterDOMDocument as an XML string
    * 
    * @param mixed $context
