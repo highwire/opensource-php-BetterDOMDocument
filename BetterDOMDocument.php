@@ -757,7 +757,6 @@ class BetterDOMDocument extends DOMDocument {
    *     it will transform all elements with xlink:type = simple into a <a href> element. 
    *     Alternatively you may specify your own xpath for selecting which elements get transformed
    *     into <a href> tags. 
-   * 
    * @return HTML string
    */  
   function asHTML($context = NULL, $options = array()) {
@@ -776,7 +775,7 @@ class BetterDOMDocument extends DOMDocument {
       </xsl:stylesheet>';
 
     $xslOptions = '
-      <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink" ||namespaces||>
       <xsl:template match="*">
         <xsl:choose>
           <xsl:when test="||xlink||">
@@ -807,13 +806,22 @@ class BetterDOMDocument extends DOMDocument {
       </xsl:stylesheet>';
 
     if (!empty($options)) {
+      // Add in the namespaces
+      foreach ($this->getNamespaces() as $prefix => $url) {
+        $namespaces = '';
+        if ($prefix != 'xsl' && $prefix != 'xlink') {
+          $namespaces .= 'xmlns:' . $prefix . '="' . $url. '" ';
+        }
+        $xslOptions = str_replace("||namespaces||", $namespaces, $xslOptions);
+      }
+
+      // Add in xlink options
       if ($options['xlink'] === TRUE) {
         $options['xlink'] = "@xlink:type = 'simple'";
       }
       else if (empty($options['xlink'])) {
         $options['xlink'] = "false()";
       }
-
       $xslOptions = str_replace("||xlink||", $options['xlink'], $xslOptions);
       $transformed = $this->tranform($xslOptions, $context);
     }
