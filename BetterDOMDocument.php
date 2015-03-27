@@ -750,24 +750,77 @@ class BetterDOMDocument extends DOMDocument {
    *   $context can either be an xpath string, or a DOMElement. Ommiting it
    *   results in transforming the entire document
    * 
+   * @param array $options
+   *   Options for transforming the HTML into XML. The following options are supported:
+   *   'xlink' => {TRUE or xpath}
+   *     Transform xlink links into <a href> elements. If you specify 'xlink' => TRUE then 
+   *     it will transform all elements with xlink:type = simple into a <a href> element. 
+   *     Alternatively you may specify your own xpath for selecting which elements get transformed
+   *     into <a href> tags. 
+   * 
    * @return HTML string
    */  
-  function asHTML($context = NULL) {
-    $xsl = '
+  function asHTML($context = NULL, $options = array()) {
+    $xslSimple = '
       <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
       <xsl:template match="*">
-      <span class="{translate(name(.),\':\',\'-\')}">
-        <xsl:for-each select="./@*">
-          <xsl:attribute name="data-{translate(name(.),\':\',\'-\')}">
-            <xsl:value-of select="." />
-          </xsl:attribute>
-        </xsl:for-each>
-        <xsl:apply-templates/>
-      </span>
+        <span class="{translate(name(.),\':\',\'-\')}">
+          <xsl:for-each select="./@*">
+            <xsl:attribute name="data-{translate(name(.),\':\',\'-\')}">
+              <xsl:value-of select="." />
+            </xsl:attribute>
+          </xsl:for-each>
+          <xsl:apply-templates/>
+        </span>
       </xsl:template>
       </xsl:stylesheet>';
+
+    $xslOptions = '
+      <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <xsl:template match="*">
+        <xsl:choose>
+          <xsl:when test="||xlink||">
+            <a class="{translate(name(.),\':\',\'-\')}">
+              <xsl:for-each select="./@*">
+                <xsl:attribute name="data-{translate(name(.),\':\',\'-\')}">
+                  <xsl:value-of select="."/>
+                </xsl:attribute>
+              </xsl:for-each>
+              <xsl:attribute name="href">
+                <xsl:value-of select="@xlink:href"/>
+              </xsl:attribute>
+              <xsl:apply-templates/>
+            </a>
+          </xsl:when>
+          <xsl:otherwise>
+            <span class="{translate(name(.),\':\',\'-\')}">
+              <xsl:for-each select="./@*">
+                <xsl:attribute name="data-{translate(name(.),\':\',\'-\')}">
+                  <xsl:value-of select="." />
+                </xsl:attribute>
+              </xsl:for-each>
+              <xsl:apply-templates/>
+            </span>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:template>
+      </xsl:stylesheet>';
+
+    if (!empty($options)) {
+      if ($options['xlink'] === TRUE) {
+        $options['xlink'] = "@xlink:type = 'simple'";
+      }
+      else if (empty($options['xlink'])) {
+        $options['xlink'] = "false()";
+      }
+
+      $xslOptions = str_replace("||xlink||", $options['xlink'], $xslOptions);
+      $transformed = $this->tranform($xslOptions, $context);
+    }
+    else {
+      $transformed = $this->tranform($xslSimple, $context);
+    }
     
-    $transformed = $this->tranform($xsl, $context);
     return $transformed->out();
   }
 
