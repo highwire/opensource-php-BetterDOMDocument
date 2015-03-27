@@ -436,8 +436,12 @@ class BetterDOMDocument extends DOMDocument {
     
     $pattern = "/<".preg_quote($context->nodeName)."\b[^>]*>(.*)<\/".preg_quote($context->nodeName).">/s";
     $matches = array();
-    preg_match($pattern, $this->saveXML($context), $matches);
-    return $matches[1];
+    if (preg_match($pattern, $this->saveXML($context), $matches)) {
+      return $matches[1];
+    }
+    else {
+      return '';
+    }
   }
 
   /**
