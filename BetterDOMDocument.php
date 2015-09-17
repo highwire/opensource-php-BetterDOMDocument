@@ -861,7 +861,17 @@ class BetterDOMDocument extends DOMDocument {
       }
     }
     
-    return $this->saveXML($context, LIBXML_NOEMPTYTAG);
+    // Check to seee if it's HTML, if it is we need to fix broken html void elements.
+    if ($this->documentElement->lookupNamespaceURI(NULL) == 'http://www.w3.org/1999/xhtml' || $this->documentElement->tagName == 'html') {
+      $output = $this->saveXML($context, LIBXML_NOEMPTYTAG);
+      // The types listed are html "void" elements. 
+      // Find any of these elements that have no child nodes and are therefore candidates for self-closing, replace them with a self-closed version. 
+      $pattern = '<(area|base|br|col|command|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)(\b[^<]*)><\/\1>';
+      return preg_replace('/' . $pattern . '/', '<$1$2/>', $output);
+    }
+    else {
+      return $this->saveXML($context, LIBXML_NOEMPTYTAG);
+    }
   }
   
   private function createContext(&$context, $type = 'xpath', $createDocument = TRUE) {
