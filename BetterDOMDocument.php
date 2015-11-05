@@ -659,11 +659,7 @@ class BetterDOMDocument extends DOMDocument {
       }
       else {
         $parent = $node->parentNode;
-        $nsuri = $parent->namespaceURI;
         $parent->removeChild($node);
-        if (!$parent->parentNode) {
-          $parent->namespaceURI = $nsuri;
-        }
       }
     }
   }
