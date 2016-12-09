@@ -12,21 +12,21 @@ class BetterDOMDocument extends DOMDocument {
   public  $ns = array();
   public  $default_ns = '';
   public  $error_checking = 'strict'; // Can be 'strict', 'warning', 'none' / FALSE
-  
+
   /**
    * Create a new BetterDOMDocument
    *
    * @param mixed $xml
-   *  $xml can either be an XML string, a DOMDocument, or a DOMElement. 
+   *  $xml can either be an XML string, a DOMDocument, or a DOMElement.
    *  You can also pass FALSE or NULL (or omit it) and load XML later using loadXML or loadHTML
-   * 
-   * @param mixed $auto_register_namespaces 
+   *
+   * @param mixed $auto_register_namespaces
    *  Auto-register namespaces. All namespaces in the root element will be registered for use in xpath queries.
    *  Namespaces that are not declared in the root element will not be auto-registered
    *  Defaults to TRUE (Meaning it will auto register all auxiliary namespaces but not the default namespace).
    *  Pass a prefix string to automatically register the default namespace.
    *  Pass FALSE to disable auto-namespace registeration
-   * 
+   *
    * @param bool $error_checking
    *  Can be 'strict', 'warning', or 'none. Defaults to 'strict'.
    *  'none' supresses all errors
@@ -35,7 +35,7 @@ class BetterDOMDocument extends DOMDocument {
    */
   function __construct($xml = FALSE, $auto_register_namespaces = TRUE, $error_checking = 'strict') {
     parent::__construct();
-    
+
     // Check up error-checking
     if ($error_checking == FALSE) {
       $this->error_checking = 'none';
@@ -46,7 +46,7 @@ class BetterDOMDocument extends DOMDocument {
     if ($this->error_checking != 'strict') {
       $this->strictErrorChecking = FALSE;
     }
-    
+
     if(is_object($xml)){
       $class = get_class($xml);
       if ($class == 'DOMElement') {
@@ -87,7 +87,7 @@ class BetterDOMDocument extends DOMDocument {
             }
           }
         }
-        
+
         // If auto_register_namespaces is a prefix string, then we register the default namespace to that string
         if (is_string($auto_register_namespaces) && $this->documentElement->getAttribute('xmlns')) {
           $this->registerNamespace($auto_register_namespaces, $this->documentElement->getAttribute('xmlns'));
@@ -119,10 +119,10 @@ class BetterDOMDocument extends DOMDocument {
 
   /**
    * Given a namespace URL, get the prefix
-   * 
+   *
    * @param string $url
    *  Connonical URL for this namespace prefix
-   * 
+   *
    * @return string
    *  The namespace prefix or FALSE if there is no namespace with that URL
    */
@@ -132,10 +132,10 @@ class BetterDOMDocument extends DOMDocument {
 
   /**
    * Given a namespace prefix, get the URL
-   * 
+   *
    * @param string $prefix
    *  namespace prefix
-   * 
+   *
    * return string
    *  The namespace URL or FALSE if there is no namespace with that prefix
    */
@@ -151,14 +151,14 @@ class BetterDOMDocument extends DOMDocument {
 
   /**
    * Given an xpath, get a list of nodes.
-   * 
+   *
    * @param string $xpath
    *  xpath to be used for query
-   * 
+   *
    * @param mixed $context
    *  $context can either be an xpath string, or a DOMElement
    *  Provides context for the xpath query
-   * 
+   *
    * @return BetterDOMNodeList
    *  A BetterDOMNodeList object, which is very similar to a DOMNodeList, but it iterates in a non-shitty fasion.
    */
@@ -168,7 +168,7 @@ class BetterDOMDocument extends DOMDocument {
     if ($context === FALSE) {
       return FALSE;
     }
-    
+
     $xob = new DOMXPath($this);
 
     // Register the namespaces
@@ -194,20 +194,20 @@ class BetterDOMDocument extends DOMDocument {
 
   /**
    * Given an xpath, get a single node (first one found)
-   * 
+   *
    * @param string $xpath
    *  xpath to be used for query
-   * 
+   *
    * @param mixed $context
    *  $context can either be an xpath string, or a DOMElement
    *  Provides context for the xpath query
-   * 
+   *
    * @return mixed
    *  The first node found by the xpath query
    */
   function xpathSingle($xpath, $context = NULL) {
     $result = $this->xpath($xpath, $context);
-    
+
     if (empty($result) || !count($result)) {
       return FALSE;
     }
@@ -219,14 +219,14 @@ class BetterDOMDocument extends DOMDocument {
 
   /**
    * DEPRECATED - USE xpath() . Given an xpath, get a list of nodes.
-   * 
+   *
    * @param string $xpath
    *  xpath to be used for query
-   * 
+   *
    * @param mixed $context
    *  $context can either be an xpath string, or a DOMElement
    *  Provides context for the xpath query
-   * 
+   *
    * @return BetterDOMNodeList
    *  A BetterDOMNodeList object, which is very similar to a DOMNodeList, but it iterates in a non-shitty fasion.
    */
@@ -236,7 +236,7 @@ class BetterDOMDocument extends DOMDocument {
     if ($context === FALSE) {
       return FALSE;
     }
-    
+
     $xob = new DOMXPath($this);
 
     // Register the namespaces
@@ -255,7 +255,7 @@ class BetterDOMDocument extends DOMDocument {
         $context_query = $raw_path_parts;
       }
       else {
-        // There's no namespaces in the query string, but the context is namespaced. 
+        // There's no namespaces in the query string, but the context is namespaced.
         // This is a bug in DOMDocument (surprise surprise), we need to try to manually construct the path.
         $prefix = $this->lookupPrefix($context->namespaceURI);
         $context_query = '';
@@ -283,7 +283,7 @@ class BetterDOMDocument extends DOMDocument {
 
   /**
    * Callback for preg_replace_callback
-   * 
+   *
    * Replace all instances of "div.foo" with a selector that will select on class
    */
   function ClassSelectorTransform($matches) {
@@ -301,23 +301,23 @@ class BetterDOMDocument extends DOMDocument {
 
     return $output;
   }
-  
+
   /**
    * DEPRECATED - use xpathSingle(). Given an xpath, a single node (first one found)
-   * 
+   *
    * @param string $xpath
    *  xpath to be used for query
-   * 
+   *
    * @param mixed $context
    *  $context can either be an xpath string, or a DOMElement
    *  Provides context for the xpath query
-   * 
+   *
    * @return mixed
    *  The first node found by the xpath query
    */
   function querySingle($xpath, $context = NULL) {
     $result = $this->query($xpath, $context);
-    
+
     if (empty($result) || !count($result)) {
       return FALSE;
     }
@@ -335,31 +335,31 @@ class BetterDOMDocument extends DOMDocument {
 
   /**
    * Given a CSS selector, get a list of nodes.
-   * 
+   *
    * @param string $selector
    *  CSS selector to be used
-   * 
+   *
    * @param mixed $context
    *  $context can either be an xpath string, or a DOMElement
    *  Provides context for the CSS selector
-   * 
+   *
    * @return BetterDOMNodeList
    *  A BetterDOMNodeList object, which is very similar to a DOMNodeList, but it iterates in a non-shitty fasion.
-   */  
+   */
   function select($selector, $context = null) {
     return $this->query($this->transformCSS($selector), $context);
   }
 
   /**
    * Given a CSS Selector, get a single node (first one found)
-   * 
+   *
    * @param string $selector
    *  CSS selector
-   * 
+   *
    * @param mixed $context
    *  $context can either be an xpath string, or a DOMElement
    *  Provides context for the CSS selector
-   * 
+   *
    * @return mixed
    *  The first node found by the CSS selector
    */
@@ -374,16 +374,16 @@ class BetterDOMDocument extends DOMDocument {
    *  Can be either FALSE, 'full', or 'inner'. Defaults to FALSE.
    *  When set to 'full' every node's full XML is also attached to the array
    *  When set to 'inner' every node's inner XML is attached to the array.
-   * 
-   * @param mixed $context 
+   *
+   * @param mixed $context
    *  Optional context node. Can pass an DOMElement object or an xpath string.
-   *  If passed, only the given node will be used when generating the array 
+   *  If passed, only the given node will be used when generating the array
    */
   function getArray($raw = FALSE, $context = NULL) {
     $array = false;
 
     $this->createContext($context, 'xpath', FALSE);
-    
+
     if ($context) {
       if ($raw == 'full') {
         $array['#raw'] = $this->saveXML($context);
@@ -396,7 +396,7 @@ class BetterDOMDocument extends DOMDocument {
           $array['@'.$attr->nodeName] = $attr->nodeValue;
         }
       }
-  
+
       if ($context->hasChildNodes()) {
         if ($context->childNodes->length == 1 && $context->firstChild->nodeType == XML_TEXT_NODE) {
           $array['#text'] = $context->firstChild->nodeValue;
@@ -424,16 +424,16 @@ class BetterDOMDocument extends DOMDocument {
 
     return $array;
   }
-  
+
   /**
    * Get the inner text of an element
-   * 
-   * @param mixed $context 
+   *
+   * @param mixed $context
    *  Optional context node. Can pass an DOMElement object or an xpath string.
    */
   function innerText($context = NULL) {
     $this->createContext($context, 'xpath');
-    
+
     $pattern = "/<".preg_quote($context->nodeName)."\b[^>]*>(.*)<\/".preg_quote($context->nodeName).">/s";
     $matches = array();
     if (preg_match($pattern, $this->saveXML($context), $matches)) {
@@ -446,14 +446,14 @@ class BetterDOMDocument extends DOMDocument {
 
   /**
    * Create an DOMElement from XML and attach it to the DOMDocument
-   * 
+   *
    * Note that this does not place it anywhere in the dom tree, it merely imports it.
-   * 
-   * @param string $xml 
+   *
+   * @param string $xml
    *  XML string to import
    */
   function createElementFromXML($xml) {
-    
+
     // To make thing easy and make sure namespaces work properly, we add the root namespace delcarations if it is not declared
     $namespaces = $this->ns;
     $xml = preg_replace_callback('/<[^\?^!].+?>/s', function($root_match) use ($namespaces) {
@@ -461,40 +461,40 @@ class BetterDOMDocument extends DOMDocument {
       $new_root = $root_tag[1];
       if (strpos($new_root, ':')) {
         $parts = explode(':', $new_root);
-        $prefix = $parts[0]; 
+        $prefix = $parts[0];
         if (isset($namespaces[$prefix])) {
           if (!strpos($root_match[0], "xmlns:$prefix")) {
-            $new_root .= " xmlns:$prefix='" . $namespaces[$prefix] . "'";             
+            $new_root .= " xmlns:$prefix='" . $namespaces[$prefix] . "'";
           }
         }
       }
       return str_replace($root_tag[1], $new_root, $root_match[0]);
     }, $xml, 1);
-    
+
     $dom = new BetterDOMDocument($xml, $this->auto_ns);
     if (!$dom->documentElement) {
       trigger_error('BetterDomDocument Error: Invalid XML: ' . $xml);
     }
     $element = $dom->documentElement;
-    
+
     // Merge the namespaces
     foreach ($dom->getNamespaces() as $prefix => $url) {
       $this->registerNamespace($prefix, $url);
     }
-    
+
     return $this->importNode($element, true);
   }
 
   /**
    * Append a child to the context node, make it the last child
-   * 
+   *
    * @param mixed $newnode
-   *  $newnode can either be an XML string, a DOMDocument, or a DOMElement. 
-   * 
+   *  $newnode can either be an XML string, a DOMDocument, or a DOMElement.
+   *
    * @param mixed $context
    *  $context can either be an xpath string, or a DOMElement
    *  Omiting $context results in using the root document element as the context
-   * 
+   *
    * @return DOMElement
    *  The $newnode, properly attached to DOMDocument. If you passed $newnode as a DOMElement
    *  then you should replace your DOMElement with the returned one.
@@ -502,20 +502,20 @@ class BetterDOMDocument extends DOMDocument {
   function append($newnode, $context = NULL) {
     $this->createContext($newnode, 'xml');
     $this->createContext($context, 'xpath');
-    
+
     if (!$context || !$newnode) {
       return FALSE;
     }
-    
+
     return $context->appendChild($newnode);
   }
-  
+
   /**
    * Append a child to the context node, make it the first child
-   * 
+   *
    * @param mixed $newnode
-   *  $newnode can either be an XML string, a DOMDocument, or a DOMElement. 
-   * 
+   *  $newnode can either be an XML string, a DOMDocument, or a DOMElement.
+   *
    * @param mixed $context
    *  $context can either be an xpath string, or a DOMElement
    *  Omiting $context results in using the root document element as the context
@@ -527,24 +527,24 @@ class BetterDOMDocument extends DOMDocument {
   function prepend($newnode, $context = NULL) {
     $this->createContext($newnode, 'xml');
     $this->createContext($context, 'xpath');
-    
+
     if (!$context || !$newnode) {
       return FALSE;
     }
-    
+
     return $context->insertBefore($newnode, $context->firstChild);
   }
 
   /**
    * Prepend a sibling to the context node, put it just before the context node
-   * 
+   *
    * @param mixed $newnode
-   *  $newnode can either be an XML string, a DOMDocument, or a DOMElement. 
-   * 
+   *  $newnode can either be an XML string, a DOMDocument, or a DOMElement.
+   *
    * @param mixed $context
    *  $context can either be an xpath string, or a DOMElement
-   *  Omiting $context results in using the root document element as the context 
-   * 
+   *  Omiting $context results in using the root document element as the context
+   *
    * @return DOMElement
    *  The $newnode, properly attached to DOMDocument. If you passed $newnode as a DOMElement
    *  then you should replace your DOMElement with the returned one.
@@ -552,24 +552,24 @@ class BetterDOMDocument extends DOMDocument {
   function prependSibling($newnode, $context) {
     $this->createContext($newnode, 'xml');
     $this->createContext($context, 'xpath');
-    
+
     if (!$context || !$newnode) {
       return FALSE;
     }
-    
+
     return $context->parentNode->insertBefore($newnode, $context);
   }
-  
+
   /**
    * Append a sibling to the context node, put it just after the context node
-   * 
+   *
    * @param mixed $newnode
-   *  $newnode can either be an XML string, a DOMDocument, or a DOMElement. 
-   * 
+   *  $newnode can either be an XML string, a DOMDocument, or a DOMElement.
+   *
    * @param mixed $context
    *  $context can either be an xpath string, or a DOMElement
-   *  Omiting $context results in using the root document element as the context 
-   * 
+   *  Omiting $context results in using the root document element as the context
+   *
    * @return DOMElement
    *  The $newnode, properly attached to DOMDocument. If you passed $newnode as a DOMElement
    *  then you should replace your DOMElement with the returned one.
@@ -577,27 +577,27 @@ class BetterDOMDocument extends DOMDocument {
   function appendSibling($newnode, $context) {
     $this->createContext($newnode, 'xml');
     $this->createContext($context, 'xpath');
-    
+
     if (!$context){
       return FALSE;
     }
-    
-    if ($context->nextSibling) { 
-      // $context has an immediate sibling : insert newnode before this one 
-      return $context->parentNode->insertBefore($newnode, $context->nextSibling); 
+
+    if ($context->nextSibling) {
+      // $context has an immediate sibling : insert newnode before this one
+      return $context->parentNode->insertBefore($newnode, $context->nextSibling);
     }
-    else { 
-      // $context has no sibling next to it : insert newnode as last child of it's parent 
-      return $context->parentNode->appendChild($newnode); 
+    else {
+      // $context has no sibling next to it : insert newnode as last child of it's parent
+      return $context->parentNode->appendChild($newnode);
     }
   }
-  
+
   /**
    * Given an xpath or DOMElement, return a new BetterDOMDocument.
-   * 
+   *
    * @param mixed $node
-   *  $node can either be an xpath string or a DOMElement. 
-   * 
+   *  $node can either be an xpath string or a DOMElement.
+   *
    * @return BetterDOMDocument
    *  A new BetterDOMDocument created from the xpath or DOMElement
    */
@@ -607,27 +607,27 @@ class BetterDOMDocument extends DOMDocument {
     $dom->ns = $this->ns;
     return $dom;
   }
-  
+
   /**
    * Given a pair of nodes, replace the first with the second
-   * 
+   *
    * @param mixed $node
    *  Node to be replaced. Can either be an xpath string or a DOMDocument (or even a DOMNode).
-   * 
+   *
    * @param mixed $replace
    *  Replace $node with $replace. Replace can be an XML string, or a DOMNode
-   * 
+   *
    * @return replaced node
    *   The overwritten / replaced node.
    */
   function replace($node, $replace) {
     $this->createContext($node, 'xpath');
     $this->createContext($replace, 'xml');
-    
+
     if (!$node || !$replace) {
       return FALSE;
     }
-        
+
     if (!$replace->ownerDocument->documentElement->isSameNode($this->documentElement)) {
       $replace = $this->importNode($replace, true);
     }
@@ -638,7 +638,7 @@ class BetterDOMDocument extends DOMDocument {
 
   /**
    * Given a node(s), remove / delete them
-   * 
+   *
    * @param mixed $node
    *  Can pass a DOMNode, a BetterDOMNodeList, DOMNodeList, an xpath string, or an array of any of these.
    */
@@ -647,7 +647,7 @@ class BetterDOMDocument extends DOMDocument {
     if (is_string($node)) {
       $node = $this->query($node);
     }
-    
+
     if ($node) {
       if (is_array($node) || get_class($node) == 'BetterDOMNodeList') {
         foreach($node as $item) {
@@ -663,17 +663,17 @@ class BetterDOMDocument extends DOMDocument {
       }
     }
   }
-  
+
   /**
    * Given an XSL string, transform the BetterDOMDocument (or a passed context node)
-   * 
+   *
    * @param string $xsl
    *   XSL Transormation
-   * 
+   *
    * @param mixed $context
    *   $context can either be an xpath string, or a DOMElement. Ommiting it
    *   results in transforming the entire document
-   * 
+   *
    * @return a new BetterDOMDocument
    */
   function tranform($xsl, $context = NULL) {
@@ -686,33 +686,33 @@ class BetterDOMDocument extends DOMDocument {
       }
       $doc = new BetterDOMDocument($context);
     }
-    
+
     $xslDoc = new BetterDOMDocument($xsl);
     $xslt = new XSLTProcessor();
     $xslt->importStylesheet($xslDoc);
-    
+
     return new BetterDomDocument($xslt->transformToDoc($doc));
   }
 
   /**
    * Given a node, change it's namespace to the specified namespace in situ
-   * 
+   *
    * @param mixed $node
    *  Node to be changed. Can either be an xpath string or a DOMElement.
-   * 
+   *
    * @param mixed $replace
    *  Replace $node with $replace. Replace can be an XML string, or a DOMNode
-   * 
+   *
    * @return the changed node
    *   The node with the new namespace. The node will also be changed in-situ in the document as well.
    */
   function changeNamespace($node, $prefix, $url) {
     $this->createContext($node, 'xpath');
-    
+
     if (!$node) {
       return FALSE;
     }
-    
+
     $this->registerNamespace($prefix, $url);
 
     if (get_class($node) == 'DOMElement') {
@@ -731,7 +731,7 @@ class BetterDOMDocument extends DOMDocument {
         </xsl:stylesheet>';
 
       $transformed = $this->tranform($xsl, $node);
-      return $this->replace($node, $transformed->documentElement);   
+      return $this->replace($node, $transformed->documentElement);
     }
     else {
       // @@TODO: Report the correct calling file and number
@@ -745,20 +745,20 @@ class BetterDOMDocument extends DOMDocument {
    * Transforms the document (or passed context) into a set of HTML spans.
    * The element name becomes the class, all other attributes become HTML5
    * "data-" attributes.
-   * 
+   *
    * @param mixed $context
    *   $context can either be an xpath string, or a DOMElement. Ommiting it
    *   results in transforming the entire document
-   * 
+   *
    * @param array $options
    *   Options for transforming the HTML into XML. The following options are supported:
    *   'xlink' => {TRUE or xpath}
-   *     Transform xlink links into <a href> elements. If you specify 'xlink' => TRUE then 
-   *     it will transform all elements with xlink:type = simple into a <a href> element. 
+   *     Transform xlink links into <a href> elements. If you specify 'xlink' => TRUE then
+   *     it will transform all elements with xlink:type = simple into a <a href> element.
    *     Alternatively you may specify your own xpath for selecting which elements get transformed
-   *     into <a href> tags. 
+   *     into <a href> tags.
    * @return HTML string
-   */  
+   */
   function asHTML($context = NULL, $options = array()) {
     $xslSimple = '
       <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
@@ -828,19 +828,19 @@ class BetterDOMDocument extends DOMDocument {
     else {
       $transformed = $this->tranform($xslSimple, $context);
     }
-    
+
     return $transformed->out();
   }
 
   /**
    * Output the BetterDOMDocument as an XML string
-   * 
+   *
    * @param mixed $context
    *   $context can either be an xpath string, or a DOMElement. Ommiting it
    *   results in outputting the entire document
-   * 
+   *
    * @return XML string
-   */  
+   */
   function out($context = NULL) {
     $this->createContext($context, 'xpath');
     if (!$context) {
@@ -856,12 +856,12 @@ class BetterDOMDocument extends DOMDocument {
         $context->setAttribute('xmlns:' . $prefix, $namespace);
       }
     }
-    
+
     // Check to seee if it's HTML, if it is we need to fix broken html void elements.
     if ($this->documentElement->lookupNamespaceURI(NULL) == 'http://www.w3.org/1999/xhtml' || $this->documentElement->tagName == 'html') {
       $output = $this->saveXML($context, LIBXML_NOEMPTYTAG);
-      // The types listed are html "void" elements. 
-      // Find any of these elements that have no child nodes and are therefore candidates for self-closing, replace them with a self-closed version. 
+      // The types listed are html "void" elements.
+      // Find any of these elements that have no child nodes and are therefore candidates for self-closing, replace them with a self-closed version.
       $pattern = '<(area|base|br|col|command|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)(\b[^<]*)><\/\1>';
       return preg_replace('/' . $pattern . '/', '<$1$2/>', $output);
     }
@@ -869,7 +869,7 @@ class BetterDOMDocument extends DOMDocument {
       return $this->saveXML($context, LIBXML_NOEMPTYTAG);
     }
   }
-  
+
   private function createContext(&$context, $type = 'xpath', $createDocument = TRUE) {
     if (!$context && $createDocument) {
       $context = $this->documentElement;
@@ -900,11 +900,11 @@ class BetterDOMDocument extends DOMDocument {
       }
     }
   }
-  
+
   // Turns CSS selector in to xpath
   private function transformCSS($path) {
     $path = (string) $path;
-    
+
     if (strstr($path, ',')) {
       $paths       = explode(',', $path);
       $expressions = array();
@@ -950,10 +950,10 @@ class BetterDOMDocument extends DOMDocument {
     if (1 == count($paths)) {
       return $paths[0];
     }
-    
+
     return implode('|', $paths);
   }
-  
+
   private function transformCSSTokenize($expression) {
     // Child selectors
     $expression = str_replace('>', '/', $expression);
@@ -1001,30 +1001,41 @@ class BetterDOMDocument extends DOMDocument {
 
     return $expression;
   }
-  
+
+  /**
+   * UTF-8-compatible version of loadHTML().
+   * @see http://stackoverflow.com/a/11310258/19513
+   */
+  public function loadHTML($source) {
+    // If a document already includes a declaraction, trust it and pass on through to parent.
+    if (substr($source, 0, 5) != "<?xml") {
+      $source = '<meta http-equiv="content-type" content="text/html; charset=utf-8">' . $source;
+    }
+    return parent::loadHTML($source);
+  }
 }
 
 
 // A BetterDOMNodeList object, which is very similar to a DOMNodeList, but it iterates in a reasonable way.
 // Specifically, replacing or removing a node in the list won't screw up the index.
 class BetterDOMNodeList implements Countable, Iterator {
-  
+
   private $array = array();
   private $position = 0;
-  
+
   private $length = 0;
   private $dom;
-  
+
   function __construct(DOMNodeList $DOMNodeList, BetterDOMDocument $dom) {
     foreach ($DOMNodeList as $item) {
       $this->array[] = $item;
     }
-    
+
     $this->dom = $dom;
     $this->length = count($this->array);
     $this->position = 0;
   }
-  
+
   // Provides read-only access to $length and $dom
   function __get ($prop) {
     if ($prop == 'length') {
@@ -1057,14 +1068,14 @@ class BetterDOMNodeList implements Countable, Iterator {
   function valid() {
     return isset($this->array[$this->position]);
   }
-  
+
   function item($index) {
     if (isset($this->array[$index])) {
       return $this->array[$index];
     }
     else return FALSE;
   }
-  
+
   function count() {
     return count($this->array);
   }
