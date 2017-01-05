@@ -717,6 +717,13 @@ class DOMDoc extends \DOMDocument {
       return $this->saveXML($context, LIBXML_NOEMPTYTAG);
     }
   }
+
+  /**
+   * Magic method for casting a DOMDoc as a string
+   */ 
+  function __toString() {
+    return $this->out();
+  }
   
   private function createContext(&$context, $type = 'xpath', $createDocument = TRUE) {
     if (!$context && $createDocument) {
