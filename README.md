@@ -3,11 +3,17 @@
 BetterDOMDocument is a handy PHP utility class for working with XML. It's a wrapper for PHP's built in DOMDocument that provides a bunch of nice shortcuts that
 makes working with XML in PHP a breeze. It has great built-in support for namespaces, xpath, and CSS selectors.
 
+```
+composer require highwire/better-dom-document
+```
+
 ```php
 <?php
 
+use BetterDOMDocument\DOMDoc;
+
 // We can load a new BetterDOMDocument from either a string or a DOMNode object
-$dom = new BetterDOMDocument($xmlstring);
+$dom = new DOMDoc($xmlstring);
 
 // It's easy to output the entire document as an array, which is sometimes easier to work with in PHP
 $array = $dom->getArray();
@@ -19,10 +25,10 @@ $node_list = $dom->xpath('//xpath/to/node', $optional_context_node);
 $dom_node = $dom->xpathSingle('//xpath/to/node');
 
 // Swapping out DOMNodes is really easy
-$dom->replace($DomNode, $replacementNode);
+$dom->replace($dom_node, $replacementNode);
 
 // Removing a node is easy
-$dom->remove($DomNode);
+$dom->remove($dom_node);
 
 // Most places where you want to pass a DOMNode or element, you can just pass an xpath instead
 $dom->remove('//xpath/to/element/to/remove');
@@ -34,7 +40,7 @@ $dom->replace('//xpath/to/replace', '<xml>You can pass a string, a DOMNode, or a
 $xml = $dom->out();
 
 // Or just output a single DOMNode
-$xml = $dom->out($DOMNode);
+$xml = $dom->out($dom_node);
 
 
 // Working with namespaced documents is made really easy
@@ -51,7 +57,7 @@ $xml = '
 
 // If your document (like the one above) has a default namespace, you should declare 
 // it's prefix as the second value when constructing a new BetterDOMDocument
-$dom = new BetterDOMDocument($xml, 'atom'); // We register the 'atom' prefix against the default namespace
+$dom = new DOMDoc($xml, 'atom'); // We register the 'atom' prefix against the default namespace
 
 // Now we can do mixed namespace queries!
 $surname = $dom->querySingle('//atom:author/nlm:name/nlm:surname')->nodeValue;
