@@ -10,7 +10,7 @@ class DOMDoc extends \DOMDocument {
 
   private $auto_ns = FALSE;
   public  $ns = array();
-  public  $default_ns = '';
+  public  $default_prefix = '';
   public  $error_checking = 'strict'; // Can be 'strict', 'warning', 'none' / FALSE
   
   /**
@@ -62,7 +62,7 @@ class DOMDoc extends \DOMDocument {
           $this->appendChild($this->importNode($xml->documentElement, true));
         }
         $this->ns = $xml->ns;
-        $this->default_ns = $xml->default_ns;
+        $this->default_prefix = $xml->default_prefix;
       }
     }
 
@@ -91,7 +91,15 @@ class DOMDoc extends \DOMDocument {
         // If auto_register_namespaces is a prefix string, then we register the default namespace to that string
         if (is_string($auto_register_namespaces) && $this->documentElement->getAttribute('xmlns')) {
           $this->registerNamespace($auto_register_namespaces, $this->documentElement->getAttribute('xmlns'));
-          $this->default_ns = $auto_register_namespaces;
+          $this->default_prefix = $auto_register_namespaces;
+        }
+        // Otherwise, automatically set-up the root element tag name as the prefix for the default namespace
+        else if ($this->documentElement->getAttribute('xmlns')) {
+          $tagname = $this->documentElement->tagName;
+          if (empty($this->ns[$tagname])) {
+            $this->registerNamespace($tagname, $this->documentElement->getAttribute('xmlns'));
+            $this->default_prefix = $tagname;
+          }
         }
       }
     }
