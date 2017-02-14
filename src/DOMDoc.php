@@ -1,5 +1,7 @@
 <?php namespace BetterDOMDocument;
 
+use Symfony\Component\CssSelector\CssSelectorConverter;
+
 /**
  * Highwire Better DOM Document
  *
@@ -221,6 +223,47 @@ class DOMDoc extends \DOMDocument {
     else {
       return $result->item(0);
     }
+  }
+
+
+  /**
+   * Given an CSS selector, get a list of nodes.
+   * 
+   * @param string $css_selector
+   *  CSS Selector to be used for query
+   * 
+   * @param mixed $context
+   *  $context can either be an xpath string, or a DOMElement
+   *  Provides context for the CSS selector
+   * 
+   * @return DOMList
+   *  A DOMList object, which is very similar to a DOMNodeList, but with better iterabilility.
+   */
+  function select($css_selector, $context = NULL) {
+    $converter = new CssSelectorConverter();
+    $xpath = $converter->toXPath($css_selector);
+
+    return $this->xpath($xpath, $context);
+  }
+
+  /**
+   * Given an CSS selector, get a single node.
+   * 
+   * @param string $css_selector
+   *  CSS Selector to be used for query
+   * 
+   * @param mixed $context
+   *  $context can either be an xpath string, or a DOMElement
+   *  Provides context for the CSS selector
+   * 
+   * @return DOMList
+   *  A DOMList object, which is very similar to a DOMNodeList, but with better iterabilility.
+   */
+  function selectSingle($css_selector, $context = NULL) {
+    $converter = new CssSelectorConverter();
+    $xpath = $converter->toXPath($css_selector);
+
+    return $this->xpathSingle($xpath, $context);
   }
 
   /**
