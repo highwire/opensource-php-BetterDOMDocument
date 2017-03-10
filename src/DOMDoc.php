@@ -747,9 +747,6 @@ class DOMDoc extends \DOMDocument {
     }
 
     // Copy namespace prefixes
-    if ($this->default_ns && !$context->hasAttribute('xmlns')) {
-      $context->setAttribute('xmlns', $namespace);
-    }
     foreach ($this->ns as $prefix => $namespace) {
       if (!$context->hasAttribute('xmlns:' . $prefix)) {
         $context->setAttribute('xmlns:' . $prefix, $namespace);
