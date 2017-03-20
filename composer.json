@@ -13,7 +13,7 @@
     "authors":[
         {
             "name":"Patrick Hayes", 
-            "homepage": "https://github.com/phayes",
+            "homepage": "https://github.com/phayes"
         }
     ],
     "require-dev": {
