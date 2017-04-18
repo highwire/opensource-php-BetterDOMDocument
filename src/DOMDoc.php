@@ -12,7 +12,7 @@ class DOMDoc extends \DOMDocument {
 
   private $auto_ns = FALSE;
   public  $ns = array();
-  public  $default_prefix = '';
+  public  $default_ns = FALSE;
   public  $error_checking = 'strict'; // Can be 'strict', 'warning', 'none' / FALSE
   
   /**
@@ -37,17 +37,8 @@ class DOMDoc extends \DOMDocument {
    */
   function __construct($xml = FALSE, $auto_register_namespaces = TRUE, $error_checking = 'strict') {
     parent::__construct();
-    
-    // Check up error-checking
-    if ($error_checking == FALSE) {
-      $this->error_checking = 'none';
-    }
-    else {
-      $this->error_checking = $error_checking;
-    }
-    if ($this->error_checking != 'strict') {
-      $this->strictErrorChecking = FALSE;
-    }
+
+    $this->setErrorChecking($error_checking);
     
     if(is_object($xml)){
       $class = get_class($xml);
@@ -64,16 +55,15 @@ class DOMDoc extends \DOMDocument {
           $this->appendChild($this->importNode($xml->documentElement, true));
         }
         $this->ns = $xml->ns;
-        $this->default_prefix = $xml->default_prefix;
       }
     }
 
     if ($xml && is_string($xml)) {
       if ($this->error_checking == 'none') {
-        @$this->loadXML($xml);
+        @$this->loadXML($xml, LIBXML_COMPACT);
       }
       else {
-        if (!$this->loadXML($xml)) {
+        if (!$this->loadXML($xml, LIBXML_COMPACT)) {
           trigger_error('BetterDOMDocument\DOMDoc: Could not load: ' . htmlspecialchars($xml), E_USER_WARNING);
         }
       }
@@ -81,28 +71,7 @@ class DOMDoc extends \DOMDocument {
       // There is no way in DOMDocument to auto-detect or list namespaces.
       // Regretably the only option is to parse the first container element for xmlns psudo-attributes
       if ($auto_register_namespaces) {
-        $this->auto_ns = TRUE;
-        if (preg_match('/<[^\?^!].+?>/s', $xml, $elem_match)) {
-          if (preg_match_all('/xmlns:(.+?)=.*?["\'](.+?)["\']/s', $elem_match[0], $ns_matches)) {
-            foreach ($ns_matches[1] as $i => $ns_key) {
-              $this->registerNamespace(trim($ns_key), trim($ns_matches[2][$i]));
-            }
-          }
-        }
-        
-        // If auto_register_namespaces is a prefix string, then we register the default namespace to that string
-        if (is_string($auto_register_namespaces) && $this->documentElement->getAttribute('xmlns')) {
-          $this->registerNamespace($auto_register_namespaces, $this->documentElement->getAttribute('xmlns'));
-          $this->default_prefix = $auto_register_namespaces;
-        }
-        // Otherwise, automatically set-up the root element tag name as the prefix for the default namespace
-        else if ($this->documentElement->getAttribute('xmlns')) {
-          $tagname = $this->documentElement->tagName;
-          if (empty($this->ns[$tagname])) {
-            $this->registerNamespace($tagname, $this->documentElement->getAttribute('xmlns'));
-            $this->default_prefix = $tagname;
-          }
-        }
+        $this->AutoRegisterNamespace($auto_register_namespaces);
       }
     }
   }
@@ -771,6 +740,70 @@ class DOMDoc extends \DOMDocument {
    */ 
   function __toString() {
     return $this->out();
+  }
+
+  public function setErrorChecking($error_checking) {
+    // Check up error-checking
+    if ($error_checking == FALSE) {
+      $this->error_checking = 'none';
+    }
+    else {
+      $this->error_checking = $error_checking;
+    }
+    if ($this->error_checking != 'strict') {
+      $this->strictErrorChecking = FALSE;
+    }
+  }
+
+  private function AutoRegisterNamespace($auto_register_namespaces) {
+    $this->auto_ns = TRUE;
+
+    // If it's an "XML" document, then get namespaces via xpath
+    $xpath = new DOMXPath($this);
+    foreach($xpath->query('namespace::*') as $namespace) {
+      if (!empty($namespace->prefix)) {
+        $this->registerNamespace($namespace->prefix, $namespace->nodeValue);
+      }
+      else {
+        $this->default_ns = $namespace->nodeValue;
+        if (is_string($auto_register_namespaces)) {
+          $this->registerNamespace($auto_register_namespaces, $namespace->nodeValue);
+        }
+        // Otherwise, automatically set-up the root element tag name as the prefix for the default namespace
+        else {
+          $tagname = $this->documentElement->tagName;
+          if (empty($this->ns[$tagname])) {
+            $this->registerNamespace($tagname, $this->documentElement->getAttribute('xmlns'));
+          }
+          $this->registerNamespace($auto_register_namespaces, $attr->value); 
+        }
+      }
+    }
+
+    // If it's an "HTML" document, we get namespaces via attributes
+    if (empty($this->ns)) {
+      foreach ($this->documentElement->attributes as $attr) {
+        if ($attr->name == 'xmlns') {
+          $this->default_ns = $attr->value;
+          // If auto_register_namespaces is a prefix string, then we register the default namespace to that string
+          if (is_string($auto_register_namespaces)) {
+            $this->registerNamespace($auto_register_namespaces, $attr->value);
+          }
+          // Otherwise, automatically set-up the root element tag name as the prefix for the default namespace
+          else {
+            $tagname = $this->documentElement->tagName;
+            if (empty($this->ns[$tagname])) {
+              $this->registerNamespace($tagname, $this->documentElement->getAttribute('xmlns'));
+            }
+            $this->registerNamespace($auto_register_namespaces, $attr->value); 
+          }
+        }
+        else if (substr($attr->name,0,6) == 'xmlns:') {
+          $prefix = substr($attr->name,6);
+          $this->registerNamespace($prefix, $attr->value); 
+        }
+      }
+    }
   }
   
   private function createContext(&$context, $type = 'xpath', $createDocument = TRUE) {
