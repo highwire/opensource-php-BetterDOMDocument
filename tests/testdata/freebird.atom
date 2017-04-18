@@ -1,0 +1,10 @@
+<atom:entry 
+  xmlns:atom="http://www.w3.org/2005/Atom" 
+  xmlns:app="http://www.w3.org/2007/app" 
+  xmlns:nlm="http://schema.highwire.org/NLM/Journal" 
+  xmlns:x="http://www.w3.org/1999/xhtml">
+  <atom:id>freebird</atom:id>
+  <atom:title>Freebird Test Corpus</atom:title>
+  <atom:updated>2017-01-13T14:15:13.593-08:00</atom:updated>
+  <app:edited>2017-02-08T13:12:20.119231-08:00</app:edited>
+</atom:entry>

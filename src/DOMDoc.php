@@ -67,12 +67,9 @@ class DOMDoc extends \DOMDocument {
           trigger_error('BetterDOMDocument\DOMDoc: Could not load: ' . htmlspecialchars($xml), E_USER_WARNING);
         }
       }
-
-      // There is no way in DOMDocument to auto-detect or list namespaces.
-      // Regretably the only option is to parse the first container element for xmlns psudo-attributes
-      if ($auto_register_namespaces) {
-        $this->AutoRegisterNamespace($auto_register_namespaces);
-      }
+    }
+    if ($auto_register_namespaces) {
+      $this->AutoRegisterNamespace($auto_register_namespaces);
     }
   }
 
@@ -771,7 +768,9 @@ class DOMDoc extends \DOMDocument {
     $xpath = new \DOMXPath($this);
     foreach($xpath->query('namespace::*') as $namespace) {
       if (!empty($namespace->prefix)) {
-        $this->registerNamespace($namespace->prefix, $namespace->nodeValue);
+        if ($namespace->prefix != 'xml' && $namespace->nodeValue != 'http://www.w3.org/XML/1998/namespace') {
+          $this->registerNamespace($namespace->prefix, $namespace->nodeValue);
+        }
       }
       else {
         $this->default_ns = $namespace->nodeValue;
