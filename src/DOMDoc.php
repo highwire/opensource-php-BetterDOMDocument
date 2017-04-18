@@ -755,11 +755,20 @@ class DOMDoc extends \DOMDocument {
     }
   }
 
+  public static function loadFile($file_or_url, $auto_register_namespaces = TRUE) {
+    $dom = @parent::load($file_or_url);
+    if (empty($dom)) {
+      return FALSE;
+    }
+
+    return new DOMDoc($dom, $auto_register_namespaces);
+  }
+
   private function AutoRegisterNamespace($auto_register_namespaces) {
     $this->auto_ns = TRUE;
 
     // If it's an "XML" document, then get namespaces via xpath
-    $xpath = new DOMXPath($this);
+    $xpath = new \DOMXPath($this);
     foreach($xpath->query('namespace::*') as $namespace) {
       if (!empty($namespace->prefix)) {
         $this->registerNamespace($namespace->prefix, $namespace->nodeValue);

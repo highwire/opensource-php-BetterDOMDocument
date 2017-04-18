@@ -15,7 +15,6 @@ class PrefixTest extends PHPUnit_Framework_TestCase {
     }
 }
 
-
 class MultiPrefixTest extends PHPUnit_Framework_TestCase {
     private $xml = '<?xml version="1.0"?><!-- This is a comment -->
                     <atom:author test="123" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:nlm="http://schema.highwire.org/NLM/Journal" xmlns:hwp="http://schema.highwire.org/Journal" nlm:contrib-type="author">
