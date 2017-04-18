@@ -12,7 +12,8 @@
     },
     "authors":[
         {
-            "name":"Patrick Hayes"
+            "name":"Patrick Hayes", 
+            "homepage": "https://github.com/phayes"
         }
     ],
     "require-dev": {
