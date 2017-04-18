@@ -784,7 +784,6 @@ class DOMDoc extends \DOMDocument {
           if (empty($this->ns[$tagname])) {
             $this->registerNamespace($tagname, $this->documentElement->getAttribute('xmlns'));
           }
-          $this->registerNamespace($auto_register_namespaces, $attr->value); 
         }
       }
     }
@@ -802,9 +801,8 @@ class DOMDoc extends \DOMDocument {
           else {
             $tagname = $this->documentElement->tagName;
             if (empty($this->ns[$tagname])) {
-              $this->registerNamespace($tagname, $this->documentElement->getAttribute('xmlns'));
-            }
-            $this->registerNamespace($auto_register_namespaces, $attr->value); 
+              $this->registerNamespace($tagname, $attr->value);
+            } 
           }
         }
         else if (substr($attr->name,0,6) == 'xmlns:') {
