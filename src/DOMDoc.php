@@ -756,7 +756,7 @@ class DOMDoc extends \DOMDocument {
   }
 
   public static function loadFile($file_or_url, $auto_register_namespaces = TRUE) {
-    $dom = @parent::load($file_or_url);
+    $dom = @parent::load($file_or_url, LIBXML_COMPACT);
     if (empty($dom)) {
       return FALSE;
     }
