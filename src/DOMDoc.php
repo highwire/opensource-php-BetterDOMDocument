@@ -371,8 +371,15 @@ class DOMDoc extends \DOMDocument {
     if (!$context || !$newnode) {
       return FALSE;
     }
-    
-    return $context->appendChild($newnode);
+  
+    if ($newnode->ownerDocument === $this) {
+      $appendnode = $newnode;
+    }
+    else {
+      $appendnode = $this->importNode($newnode, true);
+    }
+
+    return $context->appendChild($appendnode);
   }
   
   /**
@@ -453,7 +460,13 @@ class DOMDoc extends \DOMDocument {
     }
     else { 
       // $context has no sibling next to it : insert newnode as last child of it's parent 
-      return $context->parentNode->appendChild($newnode); 
+      if ($newnode->ownerDocument === $this) {
+        $appendnode = $newnode;
+      }
+      else {
+        $appendnode = $this->importNode($newnode, true);
+      }
+      return $context->parentNode->appendChild($appendnode); 
     }
   }
   
