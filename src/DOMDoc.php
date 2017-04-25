@@ -99,7 +99,7 @@ class DOMDoc extends \DOMDocument {
    * @param string $url
    *  Connonical URL for this namespace prefix
    * 
-   * @return string
+   * @return string|false
    *  The namespace prefix or FALSE if there is no namespace with that URL
    */
   function lookupPrefix($url) {
@@ -112,7 +112,7 @@ class DOMDoc extends \DOMDocument {
    * @param string $prefix
    *  namespace prefix
    * 
-   * return string
+   * return string|false
    *  The namespace URL or FALSE if there is no namespace with that prefix
    */
   function lookupURL($prefix) {
@@ -134,7 +134,7 @@ class DOMDoc extends \DOMDocument {
    *  $context can either be an xpath string, or a DOMElement
    *  Provides context for the xpath query
    * 
-   * @return DOMList
+   * @return DOMList|false
    *  A DOMList object, which is very similar to a DOMNodeList, but with better iterabilility.
    */
   function xpath($xpath, $context = NULL) {
@@ -360,7 +360,7 @@ class DOMDoc extends \DOMDocument {
    *  $context can either be an xpath string, or a DOMElement
    *  Omiting $context results in using the root document element as the context
    * 
-   * @return DOMElement
+   * @return DOMElement|false
    *  The $newnode, properly attached to DOMDocument. If you passed $newnode as a DOMElement
    *  then you should replace your DOMElement with the returned one.
    */
@@ -392,7 +392,7 @@ class DOMDoc extends \DOMDocument {
    *  $context can either be an xpath string, or a DOMElement
    *  Omiting $context results in using the root document element as the context
    *
-   * @return DOMElement
+   * @return DOMElement|false
    *  The $newnode, properly attached to DOMDocument. If you passed $newnode as a DOMElement
    *  then you should replace your DOMElement with the returned one.
    */
@@ -417,7 +417,7 @@ class DOMDoc extends \DOMDocument {
    *  $context can either be an xpath string, or a DOMElement
    *  Omiting $context results in using the root document element as the context 
    * 
-   * @return DOMElement
+   * @return DOMElement|false
    *  The $newnode, properly attached to DOMDocument. If you passed $newnode as a DOMElement
    *  then you should replace your DOMElement with the returned one.
    */
@@ -442,7 +442,7 @@ class DOMDoc extends \DOMDocument {
    *  $context can either be an xpath string, or a DOMElement
    *  Omiting $context results in using the root document element as the context 
    * 
-   * @return DOMElement
+   * @return DOMElement|false
    *  The $newnode, properly attached to DOMDocument. If you passed $newnode as a DOMElement
    *  then you should replace your DOMElement with the returned one.
    */
@@ -495,7 +495,7 @@ class DOMDoc extends \DOMDocument {
    * @param mixed $replace
    *  Replace $node with $replace. Replace can be an XML string, or a DOMNode
    * 
-   * @return replaced node
+   * @return mixed
    *   The overwritten / replaced node.
    */
   function replace($node, $replace) {
@@ -523,7 +523,7 @@ class DOMDoc extends \DOMDocument {
   function remove($node) {
     // We can't use createContext here because we want to use the entire nodeList (not just a single element)
     if (is_string($node)) {
-      $node = $this->query($node);
+      $node = $this->xpath($node);
     }
     
     if ($node) {
@@ -578,10 +578,13 @@ class DOMDoc extends \DOMDocument {
    * @param mixed $node
    *  Node to be changed. Can either be an xpath string or a DOMElement.
    * 
-   * @param mixed $replace
-   *  Replace $node with $replace. Replace can be an XML string, or a DOMNode
+   * @param mixed $prefix
+   *   prefix for the new namespace
    * 
-   * @return the changed node
+   * @param mixed $url
+   *   The URL for the new namespace
+   * 
+   * @return mixed
    *   The node with the new namespace. The node will also be changed in-situ in the document as well.
    */
   function changeNamespace($node, $prefix, $url) {
@@ -595,8 +598,6 @@ class DOMDoc extends \DOMDocument {
 
     if (get_class($node) == 'DOMElement') {
       $elemname = array_pop(explode(':', $node->tagName));
-
-      $replace = DOMDocument::createElementNS($url, $prefix . ':' . $elemname);
 
       $xsl = '
         <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
@@ -840,7 +841,7 @@ class DOMDoc extends \DOMDocument {
         $context = $this->xpathSingle($context);
         return;
       }
-      if ($type = 'xml') {
+      if ($type == 'xml') {
         $context = $this->createElementFromXML($context);
         return;
       }
