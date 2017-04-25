@@ -10,7 +10,7 @@ class DOMList implements \Countable, \Iterator {
   private $length = 0;
   private $dom;
   
-  function __construct(\DOMNodeList $DOMNodeList, DOMDoc $dom) {
+  public function __construct(\DOMNodeList $DOMNodeList, DOMDoc $dom) {
     foreach ($DOMNodeList as $item) {
       $this->array[] = $item;
     }
@@ -21,7 +21,7 @@ class DOMList implements \Countable, \Iterator {
   }
   
   // Provides read-only access to $length and $dom
-  function __get ($prop) {
+  public function __get ($prop) {
     if ($prop == 'length') {
       return $this->length;
     }
@@ -33,34 +33,34 @@ class DOMList implements \Countable, \Iterator {
     }
   }
 
-  function rewind() {
+  public function rewind() {
     $this->position = 0;
   }
 
-  function current() {
+  public function current() {
     return $this->array[$this->position];
   }
 
-  function key() {
+  public function key() {
     return $this->position;
   }
 
-  function next() {
+  public function next() {
     ++$this->position;
   }
 
-  function valid() {
+  public function valid() {
     return isset($this->array[$this->position]);
   }
   
-  function item($index) {
+  public function item($index) {
     if (isset($this->array[$index])) {
       return $this->array[$index];
     }
     else return FALSE;
   }
   
-  function count() {
+  public function count() {
     return count($this->array);
   }
 }
