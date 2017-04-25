@@ -35,7 +35,7 @@ class DOMDoc extends \DOMDocument {
    *  'warning' is the default behavior in DOMDocument
    *  'strict' corresponds to DOMDocument strictErrorChecking TRUE
    */
-  function __construct($xml = FALSE, $auto_register_namespaces = TRUE, $error_checking = 'strict') {
+  public function __construct($xml = FALSE, $auto_register_namespaces = TRUE, $error_checking = 'strict') {
     parent::__construct();
 
     $this->setErrorChecking($error_checking);
@@ -82,14 +82,14 @@ class DOMDoc extends \DOMDocument {
    * @param string $url
    *  Connonical URL for this namespace prefix
    */
-  function registerNamespace($prefix, $url) {
+  public function registerNamespace($prefix, $url) {
     $this->ns[$prefix] = $url;
   }
 
   /**
    * Get the list of registered namespaces as an array
    */
-  function getNamespaces() {
+  public function getNamespaces() {
     return $this->ns;
   }
 
@@ -102,7 +102,7 @@ class DOMDoc extends \DOMDocument {
    * @return string|false
    *  The namespace prefix or FALSE if there is no namespace with that URL
    */
-  function lookupPrefix($url) {
+  public function lookupPrefix($url) {
     return array_search($url, $this->ns);
   }
 
@@ -115,7 +115,7 @@ class DOMDoc extends \DOMDocument {
    * return string|false
    *  The namespace URL or FALSE if there is no namespace with that prefix
    */
-  function lookupURL($prefix) {
+  public function lookupURL($prefix) {
     if (isset($this->ns[$prefix])) {
       return $this->ns[$prefix];
     }
@@ -137,7 +137,7 @@ class DOMDoc extends \DOMDocument {
    * @return DOMList|false
    *  A DOMList object, which is very similar to a DOMNodeList, but with better iterabilility.
    */
-  function xpath($xpath, $context = NULL) {
+  public function xpath($xpath, $context = NULL) {
     $this->createContext($context, 'xpath', FALSE);
 
     if ($context === FALSE) {
@@ -180,7 +180,7 @@ class DOMDoc extends \DOMDocument {
    * @return mixed
    *  The first node found by the xpath query
    */
-  function xpathSingle($xpath, $context = NULL) {
+  public function xpathSingle($xpath, $context = NULL) {
     $result = $this->xpath($xpath, $context);
     
     if (empty($result) || !count($result)) {
@@ -205,7 +205,7 @@ class DOMDoc extends \DOMDocument {
    * @return DOMList
    *  A DOMList object, which is very similar to a DOMNodeList, but with better iterabilility.
    */
-  function select($css_selector, $context = NULL) {
+  public function select($css_selector, $context = NULL) {
     $converter = new CssSelectorConverter();
     $xpath = $converter->toXPath($css_selector);
 
@@ -225,7 +225,7 @@ class DOMDoc extends \DOMDocument {
    * @return DOMList
    *  A DOMList object, which is very similar to a DOMNodeList, but with better iterabilility.
    */
-  function selectSingle($css_selector, $context = NULL) {
+  public function selectSingle($css_selector, $context = NULL) {
     $converter = new CssSelectorConverter();
     $xpath = $converter->toXPath($css_selector);
 
@@ -244,7 +244,7 @@ class DOMDoc extends \DOMDocument {
    *  Optional context node. Can pass an DOMElement object or an xpath string.
    *  If passed, only the given node will be used when generating the array 
    */
-  function getArray($raw = FALSE, $context = NULL) {
+  public function getArray($raw = FALSE, $context = NULL) {
     $array = false;
 
     $this->createContext($context, 'xpath', FALSE);
@@ -296,7 +296,7 @@ class DOMDoc extends \DOMDocument {
    * @param mixed $context 
    *  Optional context node. Can pass an DOMElement object or an xpath string.
    */
-  function innerText($context = NULL) {
+  public function innerText($context = NULL) {
     $this->createContext($context, 'xpath');
     
     $pattern = "/<".preg_quote($context->nodeName)."\b[^>]*>(.*)<\/".preg_quote($context->nodeName).">/s";
@@ -317,7 +317,7 @@ class DOMDoc extends \DOMDocument {
    * @param string $xml 
    *  XML string to import
    */
-  function createElementFromXML($xml) {
+  public function createElementFromXML($xml) {
     
     // To make thing easy and make sure namespaces work properly, we add the root namespace delcarations if it is not declared
     $namespaces = $this->ns;
@@ -364,7 +364,7 @@ class DOMDoc extends \DOMDocument {
    *  The $newnode, properly attached to DOMDocument. If you passed $newnode as a DOMElement
    *  then you should replace your DOMElement with the returned one.
    */
-  function append($newnode, $context = NULL) {
+  public function append($newnode, $context = NULL) {
     $this->createContext($newnode, 'xml');
     $this->createContext($context, 'xpath');
     
@@ -396,7 +396,7 @@ class DOMDoc extends \DOMDocument {
    *  The $newnode, properly attached to DOMDocument. If you passed $newnode as a DOMElement
    *  then you should replace your DOMElement with the returned one.
    */
-  function prepend($newnode, $context = NULL) {
+  public function prepend($newnode, $context = NULL) {
     $this->createContext($newnode, 'xml');
     $this->createContext($context, 'xpath');
     
@@ -421,7 +421,7 @@ class DOMDoc extends \DOMDocument {
    *  The $newnode, properly attached to DOMDocument. If you passed $newnode as a DOMElement
    *  then you should replace your DOMElement with the returned one.
    */
-  function prependSibling($newnode, $context) {
+  public function prependSibling($newnode, $context = NULL) {
     $this->createContext($newnode, 'xml');
     $this->createContext($context, 'xpath');
     
@@ -446,7 +446,7 @@ class DOMDoc extends \DOMDocument {
    *  The $newnode, properly attached to DOMDocument. If you passed $newnode as a DOMElement
    *  then you should replace your DOMElement with the returned one.
    */
-  function appendSibling($newnode, $context) {
+  public function appendSibling($newnode, $context) {
     $this->createContext($newnode, 'xml');
     $this->createContext($context, 'xpath');
     
@@ -479,7 +479,7 @@ class DOMDoc extends \DOMDocument {
    * @return DOMDoc
    *  A new DOMDoc created from the xpath or DOMElement
    */
-  function extract($node, $auto_register_namespaces = TRUE, $error_checking = 'none') {
+  public function extract($node, $auto_register_namespaces = TRUE, $error_checking = 'none') {
     $this->createContext($node, 'xpath');
     $dom = new DOMDoc($node, $auto_register_namespaces, $error_checking);
     $dom->ns = $this->ns;
@@ -498,7 +498,7 @@ class DOMDoc extends \DOMDocument {
    * @return mixed
    *   The overwritten / replaced node.
    */
-  function replace($node, $replace) {
+  public function replace($node, $replace) {
     $this->createContext($node, 'xpath');
     $this->createContext($replace, 'xml');
     
@@ -520,7 +520,7 @@ class DOMDoc extends \DOMDocument {
    * @param mixed $node
    *  Can pass a DOMNode, a NodeList, DOMNodeList, an xpath string, or an array of any of these.
    */
-  function remove($node) {
+  public function remove($node) {
     // We can't use createContext here because we want to use the entire nodeList (not just a single element)
     if (is_string($node)) {
       $node = $this->xpath($node);
@@ -554,7 +554,7 @@ class DOMDoc extends \DOMDocument {
    * 
    * @return a new DOMDoc
    */
-  function tranform($xsl, $context = NULL) {
+  public function tranform($xsl, $context = NULL) {
     if (!$context) {
       $doc = $this;
     }
@@ -587,7 +587,7 @@ class DOMDoc extends \DOMDocument {
    * @return mixed
    *   The node with the new namespace. The node will also be changed in-situ in the document as well.
    */
-  function changeNamespace($node, $prefix, $url) {
+  public function changeNamespace($node, $prefix, $url) {
     $this->createContext($node, 'xpath');
     
     if (!$node) {
@@ -638,7 +638,7 @@ class DOMDoc extends \DOMDocument {
    *     into <a href> tags. 
    * @return HTML string
    */  
-  function asHTML($context = NULL, $options = array()) {
+  public function asHTML($context = NULL, $options = array()) {
     $xslSimple = '
       <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
       <xsl:template match="*">
@@ -720,7 +720,7 @@ class DOMDoc extends \DOMDocument {
    * 
    * @return XML string
    */  
-  function out($context = NULL) {
+  public function out($context = NULL) {
     $this->createContext($context, 'xpath');
     if (!$context) {
       return '';
@@ -749,11 +749,11 @@ class DOMDoc extends \DOMDocument {
   /**
    * Magic method for casting a DOMDoc as a string
    */ 
-  function __toString() {
+  public function __toString() {
     return $this->out();
   }
 
-  public function setErrorChecking($error_checking) {
+  public public function setErrorChecking($error_checking) {
     // Check up error-checking
     if ($error_checking == FALSE) {
       $this->error_checking = 'none';
