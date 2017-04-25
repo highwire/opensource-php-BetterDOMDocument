@@ -753,7 +753,7 @@ class DOMDoc extends \DOMDocument {
     return $this->out();
   }
 
-  public public function setErrorChecking($error_checking) {
+  public function setErrorChecking($error_checking) {
     // Check up error-checking
     if ($error_checking == FALSE) {
       $this->error_checking = 'none';
