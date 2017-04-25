@@ -202,7 +202,7 @@ class DOMDoc extends \DOMDocument {
    *  $context can either be an xpath string, or a DOMElement
    *  Provides context for the CSS selector
    * 
-   * @return DOMList
+   * @return DOMList|false
    *  A DOMList object, which is very similar to a DOMNodeList, but with better iterabilility.
    */
   public function select($css_selector, $context = NULL) {
@@ -597,8 +597,6 @@ class DOMDoc extends \DOMDocument {
     $this->registerNamespace($prefix, $url);
 
     if (get_class($node) == 'DOMElement') {
-      $elemname = array_pop(explode(':', $node->tagName));
-
       $xsl = '
         <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
           <xsl:template match="*">
