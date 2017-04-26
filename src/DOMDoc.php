@@ -800,7 +800,7 @@ class DOMDoc extends \DOMDocument {
     }
 
     // If it's an "HTML" document, we get namespaces via attributes
-    if (empty($this->ns)) {
+    if (empty($this->ns) && !empty($this->documentElement)) {
       foreach ($this->documentElement->attributes as $attr) {
         if ($attr->name == 'xmlns') {
           $this->default_ns = $attr->value;

@@ -20,4 +20,9 @@ class LoadTest extends PHPUnit_Framework_TestCase {
       $this->assertEquals("freebird", $dom->xpathSingle('//atom:id')->nodeValue);
       $this->assertEquals("2017-02-08T13:12:20.119231-08:00", $dom->xpathSingle('//app:edited')->nodeValue);
     }
+
+    public function testEmptyLoad() {
+      $dom = new DOMDoc();
+      $this->assertEquals('', strval($dom));
+    }
 }
