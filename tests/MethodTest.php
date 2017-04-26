@@ -64,4 +64,18 @@ class MethodTest extends PHPUnit_Framework_TestCase {
       $extracted = $dom->out('//img');
       $this->assertEquals('<img class="image square" src="helloworld.jpg"/>', $extracted);
     }
+  
+    public function testArray() {
+      $dom = DOMDoc::loadFile("tests/testdata/helloworld.html");
+
+      $a = $dom->getArray();
+      $this->assertEquals('image square', $a['html'][0]['body'][0]['img'][0]['@class']);
+      $this->assertEquals('Hi there world.', $a['html'][0]['body'][0]['p'][0]['#text']);
+      
+      $a = $dom->getArray('full');
+      $this->assertEquals('<img class="image square" src="helloworld.jpg"/>', $a['html'][0]['body'][0]['img'][0]['#raw']);
+      
+      $a = $dom->getArray('inner');
+      $this->assertEquals('Hi there world.', $a['html'][0]['body'][0]['p'][0]['#raw']);
+    }
 }
