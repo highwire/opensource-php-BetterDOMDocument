@@ -775,14 +775,14 @@ class DOMDoc extends \DOMDocument {
     $success = parent::loadHTML($source, $options);
     $this->AutoRegisterNamespace(TRUE);
 
-    return $success;
+    return boolval($success);
   }
 
   public function loadXML($source, $options = NULL) {
     $success = parent::loadXML($source, $options);
     $this->AutoRegisterNamespace(TRUE);
-
-    return $success;
+    
+    return boolval($success);
   }
 
   private function AutoRegisterNamespace($auto_register_namespaces) {
