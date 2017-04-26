@@ -771,6 +771,20 @@ class DOMDoc extends \DOMDocument {
     return new DOMDoc($dom, $auto_register_namespaces);
   }
 
+  public function loadHTML($source, $options = NULL) {
+    $success = parent::loadHTML($source, $options);
+    $this->AutoRegisterNamespace(TRUE);
+
+    return $success;
+  }
+
+  public function loadXML($source, $options = NULL) {
+    $success = parent::loadXML($source, $options);
+    $this->AutoRegisterNamespace(TRUE);
+
+    return $success;
+  }
+
   private function AutoRegisterNamespace($auto_register_namespaces) {
     $this->auto_ns = TRUE;
 
