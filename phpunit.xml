@@ -17,4 +17,9 @@
     <logging>
 	    <log type="coverage-clover" target="phpunit.report.coverage.xml"/>
     </logging>
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory>src</directory>
+        </whitelist>
+    </filter>
 </phpunit>
