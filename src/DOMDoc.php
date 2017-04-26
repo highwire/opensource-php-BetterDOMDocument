@@ -45,29 +45,27 @@ class DOMDoc extends \DOMDocument {
       if ($class == 'DOMElement') {
         $this->appendChild($this->importNode($xml, true));
       }
-      if ($class == 'DOMDocument') {
+      else if ($class == 'DOMDocument') {
         if ($xml->documentElement) {
           $this->appendChild($this->importNode($xml->documentElement, true));
         }
       }
-      if ($class == 'BetterDOMDocument\DOMDoc') {
+      else if ($class == 'BetterDOMDocument\DOMDoc') {
         if ($xml->documentElement) {
           $this->appendChild($this->importNode($xml->documentElement, true));
         }
         $this->ns = $xml->ns;
       }
     }
-
-    if ($xml && is_string($xml)) {
+    else if (is_string($xml) && !empty($xml)) {
       if ($this->error_checking == 'none') {
         @$this->loadXML($xml, LIBXML_COMPACT);
       }
-      else {
-        if (!$this->loadXML($xml, LIBXML_COMPACT)) {
-          trigger_error('BetterDOMDocument\DOMDoc: Could not load: ' . htmlspecialchars($xml), E_USER_WARNING);
-        }
+      else if (!$this->loadXML($xml, LIBXML_COMPACT)) {
+        trigger_error('BetterDOMDocument\DOMDoc: Could not load: ' . htmlspecialchars($xml), E_USER_WARNING);
       }
     }
+
     if ($auto_register_namespaces) {
       $this->AutoRegisterNamespace($auto_register_namespaces);
     }
@@ -335,7 +333,7 @@ class DOMDoc extends \DOMDocument {
       }
       return str_replace($root_tag[1], $new_root, $root_match[0]);
     }, $xml, 1);
-    
+
     $dom = new DOMDoc($xml, $this->auto_ns);
     if (!$dom->documentElement) {
       trigger_error('BetterDomDocument\DOMDoc Error: Invalid XML: ' . $xml);
