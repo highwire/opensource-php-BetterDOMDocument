@@ -25,4 +25,11 @@ class LoadTest extends PHPUnit_Framework_TestCase {
       $dom = new DOMDoc();
       $this->assertEquals('', strval($dom));
     }
+  
+    public function testHTMLLoad() {
+      $dom = new DOMDoc();
+      $html = file_get_contents('tests/testdata/helloworld.xhtml');
+      $dom->loadHTML($html);
+      $this->assertEquals(['html' => 'http://www.w3.org/1999/xhtml'], $dom->getNamespaces());
+    }
 }

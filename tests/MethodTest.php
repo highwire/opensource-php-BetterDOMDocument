@@ -62,6 +62,6 @@ class MethodTest extends PHPUnit_Framework_TestCase {
       $dom = DOMDoc::loadFile("tests/testdata/helloworld.html");
 
       $extracted = $dom->out('//img');
-      $this->assertEquals('<img src="helloworld.jpg"/>', $extracted);
+      $this->assertEquals('<img class="image square" src="helloworld.jpg"/>', $extracted);
     }
 }
