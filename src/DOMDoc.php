@@ -368,24 +368,8 @@ class DOMDoc extends \DOMDocument {
     if (!$context || !$newnode) {
       return FALSE;
     }
-  
-    if ($newnode->ownerDocument === $this) {
-      $appendnode = $newnode;
-    }
-    else {
-      if (is_a($newnode, 'BetterDOMDocument\DOMDoc')) {
-        foreach ($newnode->ns as $prefix => $uri) {
-          $this->registerNamespace($prefix, $uri);
-        }
-        $newnode = $newnode->documentElement;
-      }
-      else if (is_a($newnode, 'DOMDocument')) {
-        $newnode = $newnode->documentElement;
-      }
-      $appendnode = $this->importNode($newnode, true);
-    }
 
-    return $context->appendChild($appendnode);
+    return $context->appendChild($newnode);
   }
   
   /**
@@ -465,23 +449,7 @@ class DOMDoc extends \DOMDocument {
       return $context->parentNode->insertBefore($newnode, $context->nextSibling); 
     }
     else { 
-      // $context has no sibling next to it : insert newnode as last child of it's parent 
-      if ($newnode->ownerDocument === $this) {
-        $appendnode = $newnode;
-      }
-      else {
-        if (is_a($newnode, 'BetterDOMDocument\DOMDoc')) {
-          foreach ($newnode->ns as $prefix => $uri) {
-            $this->registerNamespace($prefix, $uri);
-          }
-          $newnode = $newnode->documentElement;
-        }
-        else if (is_a($newnode, 'DOMDocument')) {
-          $newnode = $newnode->documentElement;
-        }
-        $appendnode = $this->importNode($newnode, true);
-      }
-      return $context->parentNode->appendChild($appendnode); 
+      return $context->parentNode->appendChild($newnode); 
     }
   }
   
@@ -874,14 +842,28 @@ class DOMDoc extends \DOMDocument {
       }
     }
 
-    if (is_object($context)) {
-      if (is_a($context, 'DOMElement')) {
-        return $context;
+    if (is_object($context) && is_a($context, 'DOMNode')) {
+      if ($context->ownerDocument === $this) {
+        return;
       }
-      if (is_a($context, 'DOMDocument')) {
-        return $context->documentElement;
+      if (is_a($context, 'BetterDOMDocument\DOMDoc')) {
+        foreach ($context->ns as $prefix => $uri) {
+          $this->registerNamespace($prefix, $uri);
+        }
+        $context = $this->importNode($context->documentElement, TRUE);
+        return;
+      }
+      else if (is_a($context, 'DOMDocument')) {
+        $context = $this->importNode($context->documentElement, TRUE);
+        return;
+      }
+      else {
+        $context = $this->importNode($context, TRUE);
+        return;
       }
     }
+
+    return FALSE;
   }
 }
 
