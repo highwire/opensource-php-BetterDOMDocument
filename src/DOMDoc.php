@@ -41,20 +41,19 @@ class DOMDoc extends \DOMDocument {
     $this->setErrorChecking($error_checking);
     
     if(is_object($xml)){
-      $class = get_class($xml);
-      if ($class == 'DOMElement') {
+      if (is_a($xml, 'DOMElement')) {
         $this->appendChild($this->importNode($xml, true));
       }
-      else if ($class == 'DOMDocument') {
-        if ($xml->documentElement) {
-          $this->appendChild($this->importNode($xml->documentElement, true));
-        }
-      }
-      else if ($class == 'BetterDOMDocument\DOMDoc') {
+      if (is_a($xml, 'BetterDOMDocument\DOMDoc')) {
         if ($xml->documentElement) {
           $this->appendChild($this->importNode($xml->documentElement, true));
         }
         $this->ns = $xml->ns;
+      }
+      if (is_a($xml, 'DOMDocument')) {
+        if ($xml->documentElement) {
+          $this->appendChild($this->importNode($xml->documentElement, true));
+        }
       }
     }
     else if (is_string($xml) && !empty($xml)) {
@@ -374,6 +373,15 @@ class DOMDoc extends \DOMDocument {
       $appendnode = $newnode;
     }
     else {
+      if (is_a($newnode, 'BetterDOMDocument\DOMDoc')) {
+        foreach ($newnode->ns as $prefix => $uri) {
+          $this->registerNamespace($prefix, $uri);
+        }
+        $newnode = $newnode->documentElement;
+      }
+      else if (is_a($newnode, 'DOMDocument')) {
+        $newnode = $newnode->documentElement;
+      }
       $appendnode = $this->importNode($newnode, true);
     }
 
@@ -462,6 +470,15 @@ class DOMDoc extends \DOMDocument {
         $appendnode = $newnode;
       }
       else {
+        if (is_a($newnode, 'BetterDOMDocument\DOMDoc')) {
+          foreach ($newnode->ns as $prefix => $uri) {
+            $this->registerNamespace($prefix, $uri);
+          }
+          $newnode = $newnode->documentElement;
+        }
+        else if (is_a($newnode, 'DOMDocument')) {
+          $newnode = $newnode->documentElement;
+        }
         $appendnode = $this->importNode($newnode, true);
       }
       return $context->parentNode->appendChild($appendnode); 
