@@ -1,3 +1,5 @@
+# BetterDOMDocument
+
 [![Build Status](https://scrutinizer-ci.com/g/highwire/opensource-php-BetterDOMDocument/badges/build.png?b=2.x)](https://scrutinizer-ci.com/g/highwire/opensource-php-BetterDOMDocument/build-status/2.x)
 [![Code Coverage](https://scrutinizer-ci.com/g/highwire/opensource-php-BetterDOMDocument/badges/coverage.png?b=2.x)](https://scrutinizer-ci.com/g/highwire/opensource-php-BetterDOMDocument/?branch=2.x)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/highwire/opensource-php-BetterDOMDocument/badges/quality-score.png?b=2.x)](https://scrutinizer-ci.com/g/highwire/opensource-php-BetterDOMDocument/?branch=2.x)
