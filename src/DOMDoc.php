@@ -734,6 +734,19 @@ class DOMDoc extends \DOMDocument {
     return $this->out();
   }
 
+  /**
+   * Magic method to get good debug info view var_dump
+   */ 
+  public function __debugInfo() {
+    return array(
+      'auto_ns' => $this->auto_ns,
+      'ns' => $this->ns,
+      'default_ns' => $this->default_ns,
+      'error_checking' => $this->error_checking, 
+      'content' => $this->out(),
+    );
+  }
+
   public function setErrorChecking($error_checking) {
     // Check up error-checking
     if ($error_checking == FALSE) {
