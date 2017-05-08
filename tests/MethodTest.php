@@ -2,7 +2,7 @@
 
 use BetterDOMDocument\DOMDoc;
 
-class MethodTest extends PHPUnit_Framework_TestCase {
+class MethodTest extends \PHPUnit_Framework_TestCase {
     public function testExtract() {
       $dom = DOMDoc::loadFile("tests/testdata/note.xml");
 

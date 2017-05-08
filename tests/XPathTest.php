@@ -2,7 +2,7 @@
 
 use BetterDOMDocument\DOMDoc;
 
-class XPathTest extends PHPUnit_Framework_TestCase {
+class XPathTest extends \PHPUnit_Framework_TestCase {
     private $prefix_xml = '<nlm:contrib xmlns:nlm="http://schema.highwire.org/NLM/Journal" nlm:contrib-type="author"><nlm:string-name nlm:test="teststring">Patrick Douglas Hayes</nlm:string-name></nlm:contrib>';
 
     private $multi_prefix_xml = '<?xml version="1.0"?><!-- This is a comment -->
@@ -38,6 +38,7 @@ class XPathTest extends PHPUnit_Framework_TestCase {
         $dom = new DOMDoc($this->prefix_xml);
         $this->assertEquals("teststring", $dom->xpathSingle('//@nlm:test')->nodeValue);
     }
+    
     public function testPrefixAttrContext() {
         $dom = new DOMDoc($this->prefix_xml);
         $this->assertEquals("teststring", $dom->xpathSingle('@nlm:test', "//nlm:string-name")->nodeValue);

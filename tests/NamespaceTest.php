@@ -2,7 +2,7 @@
 
 use BetterDOMDocument\DOMDoc;
 
-class NamespaceTest extends PHPUnit_Framework_TestCase {
+class NamespaceTest extends \PHPUnit_Framework_TestCase {
     public function testLookup() {
       $dom = DOMDoc::loadFile("tests/testdata/note.namespaced.xml");
 

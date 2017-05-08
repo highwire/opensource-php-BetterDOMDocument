@@ -2,7 +2,7 @@
 
 use BetterDOMDocument\DOMDoc;
 
-class CSSTest extends PHPUnit_Framework_TestCase {
+class CSSTest extends \PHPUnit_Framework_TestCase {
     public function testSelect() {
       $dom = DOMDoc::loadFile("tests/testdata/helloworld.html");
 
