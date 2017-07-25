@@ -44,25 +44,23 @@ class DOMDoc extends \DOMDocument {
       if (is_a($xml, 'DOMElement')) {
         $this->appendChild($this->importNode($xml, true));
       }
-      if (is_a($xml, 'BetterDOMDocument\DOMDoc')) {
+      else if (is_a($xml, 'BetterDOMDocument\DOMDoc')) {
         if ($xml->documentElement) {
           $this->appendChild($this->importNode($xml->documentElement, true));
         }
         $this->ns = $xml->ns;
       }
-      if (is_a($xml, 'DOMDocument')) {
+      else if (is_a($xml, 'DOMDocument')) {
         if ($xml->documentElement) {
           $this->appendChild($this->importNode($xml->documentElement, true));
         }
       }
+      else if (method_exists($xml, '__toString')) {
+        $this->loadFromString($xml->__toString());
+      }
     }
     else if (is_string($xml) && !empty($xml)) {
-      if ($this->error_checking == 'none') {
-        @$this->loadXML($xml, LIBXML_COMPACT);
-      }
-      else if (!$this->loadXML($xml, LIBXML_COMPACT)) {
-        trigger_error('BetterDOMDocument\DOMDoc: Could not load: ' . htmlspecialchars($xml), E_USER_WARNING);
-      }
+      $this->loadFromString($xml);
     }
 
     if ($auto_register_namespaces) {
@@ -878,7 +876,13 @@ class DOMDoc extends \DOMDocument {
 
     return FALSE;
   }
+
+  private function loadFromString($xml) {
+    if ($this->error_checking == 'none') {
+      @$this->loadXML($xml, LIBXML_COMPACT);
+    }
+    else if (!$this->loadXML($xml, LIBXML_COMPACT)) {
+      trigger_error('BetterDOMDocument\DOMDoc: Could not load: ' . htmlspecialchars($xml), E_USER_WARNING);
+    }
+  }
 }
-
-
-
