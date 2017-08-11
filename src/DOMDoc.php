@@ -781,7 +781,7 @@ class DOMDoc extends \DOMDocument {
     return boolval($success);
   }
 
-  private function AutoRegisterNamespace($auto_register_namespaces) {
+  protected function AutoRegisterNamespace($auto_register_namespaces) {
     $this->auto_ns = TRUE;
 
     // If it's an "XML" document, then get namespaces via xpath
@@ -832,7 +832,7 @@ class DOMDoc extends \DOMDocument {
     }
   }
   
-  private function createContext(&$context, $type = 'xpath', $createDocument = TRUE) {
+  protected function createContext(&$context, $type = 'xpath', $createDocument = TRUE) {
     if (!$context && $createDocument) {
       $context = $this->documentElement;
       return;
@@ -877,7 +877,7 @@ class DOMDoc extends \DOMDocument {
     return FALSE;
   }
 
-  private function loadFromString($xml) {
+  protected function loadFromString($xml) {
     if ($this->error_checking == 'none') {
       @$this->loadXML($xml, LIBXML_COMPACT);
     }
