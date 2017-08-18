@@ -3,10 +3,10 @@
 use Symfony\Component\CssSelector\CssSelectorConverter;
 
 /**
- * Highwire Better DOM Document
+ * Better DOM Document.
  *
  * Copyright (c) 2010-2011 Board of Trustees, Leland Stanford Jr. University
- * This software is open-source licensed under the GNU Public License Version 2 or later
+ * This software is open-source licensed under the GNU Public License Version 2 or later.
  */
 class DOMDoc extends \DOMDocument {
 
@@ -14,7 +14,7 @@ class DOMDoc extends \DOMDocument {
   public  $ns = array();
   public  $default_ns = FALSE;
   public  $error_checking = 'strict'; // Can be 'strict', 'warning', 'none' / FALSE
-  
+
   /**
    * Create a new DOMDoc
    *
@@ -30,10 +30,10 @@ class DOMDoc extends \DOMDocument {
    *  Pass FALSE to disable auto-namespace registeration
    * 
    * @param bool $error_checking
-   *  Can be 'strict', 'warning', or 'none. Defaults to 'strict'.
-   *  'none' supresses all errors
-   *  'warning' is the default behavior in DOMDocument
-   *  'strict' corresponds to DOMDocument strictErrorChecking TRUE
+   *   Can be 'strict', 'warning', or 'none. Defaults to 'strict'.
+   *   'none' supresses all errors
+   *   'warning' is the default behavior in DOMDocument
+   *   'strict' corresponds to DOMDocument strictErrorChecking TRUE
    */
   public function __construct($xml = FALSE, $auto_register_namespaces = TRUE, $error_checking = 'strict') {
     parent::__construct();
@@ -707,7 +707,7 @@ class DOMDoc extends \DOMDocument {
 
     // Copy namespace prefixes
     foreach ($this->ns as $prefix => $namespace) {
-      if (!$context->hasAttribute('xmlns:' . $prefix)) {
+      if (!empty($namespace) && !$context->hasAttribute('xmlns:' . $prefix)) {
         $context->setAttribute('xmlns:' . $prefix, $namespace);
       }
     }
