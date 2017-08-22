@@ -1,6 +1,6 @@
 {
     "name": "highwire/better-dom-document",
-    "version": "2.1.4", 
+    "version": "2.1.5", 
     "license": "BSD-3-Clause",
     "type": "library",
     "description": "BetterDOMDocument is a handy PHP utility class for working with XML. It's a wrapper for PHP's built in DOMDocument that provides a bunch of nice shortcuts that makes working with XML in PHP a breeze. It has great built-in support for namespaces, and xpath.",
