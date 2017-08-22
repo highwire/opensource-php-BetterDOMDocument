@@ -593,7 +593,7 @@ class DOMDoc extends \DOMDocument {
     }
     else {
       // @@TODO: Report the correct calling file and number
-      throw new Exception("Changing the namespace of a " . get_class($node) . " is not supported");
+      throw new \Exception("Changing the namespace of a " . get_class($node) . " is not supported");
     }
   }
 
@@ -779,6 +779,25 @@ class DOMDoc extends \DOMDocument {
     $this->AutoRegisterNamespace(TRUE);
     
     return boolval($success);
+  }
+
+  /**
+   * Removes a namespace from the document, moving the
+   * namespaced nodes to the default namespace.
+   * 
+   * @param string $prefix
+   *   Namespace prefix.
+   */ 
+  public function removeNamespace($prefix) {
+    $ns_uri = $this->ns[$prefix];
+    if (empty($ns_uri)) {
+      throw new \Exception("Unknown prefix $prefix. Try calling registerNamespace() first.");
+    }
+    $nodes = $this->xpath("//*[namespace::{$prefix} and not(../namespace::{$prefix})]");
+    foreach ($nodes as $node) {
+      $node->removeAttributeNS($ns_uri, $prefix);
+    }
+    unset($this->ns[$prefix]);
   }
 
   protected function AutoRegisterNamespace($auto_register_namespaces) {
