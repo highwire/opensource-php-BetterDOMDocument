@@ -3,7 +3,7 @@
 // A BetterDOMNodeList object, which is very similar to a DOMNodeList, but it iterates in a reasonable way.
 // Specifically, replacing or removing a node in the list won't screw up the index.
 class DOMList implements \Countable, \Iterator {
-  
+
   private $array = array();
   private $position = 0;
   
@@ -14,7 +14,7 @@ class DOMList implements \Countable, \Iterator {
     foreach ($DOMNodeList as $item) {
       $this->array[] = $item;
     }
-    
+
     $this->dom = $dom;
     $this->length = count($this->array);
     $this->position = 0;

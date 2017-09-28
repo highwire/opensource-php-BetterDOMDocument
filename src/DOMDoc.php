@@ -16,50 +16,48 @@ class DOMDoc extends \DOMDocument {
   public  $error_checking = 'strict'; // Can be 'strict', 'warning', 'none' / FALSE
 
   /**
-   * Create a new DOMDoc
+   * Create a new DOMDoc.
    *
-   * @param mixed $xml
-   *  $xml can either be an XML string, a DOMDocument, or a DOMElement. 
-   *  You can also pass FALSE or NULL (or omit it) and load XML later using loadXML or loadHTML
-   * 
-   * @param mixed $auto_register_namespaces 
-   *  Auto-register namespaces. All namespaces in the root element will be registered for use in xpath queries.
-   *  Namespaces that are not declared in the root element will not be auto-registered
-   *  Defaults to TRUE (Meaning it will auto register all auxiliary namespaces but not the default namespace).
-   *  Pass a prefix string to automatically register the default namespace.
-   *  Pass FALSE to disable auto-namespace registeration
-   * 
-   * @param bool $error_checking
+   * @param null|false|object|string $xml
+   *   $xml can either be an XML string, a DOMDocument, or a DOMElement.
+   *   You can also pass FALSE or NULL (or omit it) and load XML later using loadXML or loadHTML.
+   * @param bool|string $auto_register_namespaces 
+   *   Auto-register namespaces. All namespaces in the root element will be registered for use in xpath queries.
+   *   Namespaces that are not declared in the root element will not be auto-registered
+   *   Defaults to TRUE (Meaning it will auto register all auxiliary namespaces but not the default namespace).
+   *   Pass a prefix string to automatically register the default namespace.
+   *   Pass FALSE to disable auto-namespace registeration.
+   * @param bool|string $error_checking
    *   Can be 'strict', 'warning', or 'none. Defaults to 'strict'.
-   *   'none' supresses all errors
-   *   'warning' is the default behavior in DOMDocument
-   *   'strict' corresponds to DOMDocument strictErrorChecking TRUE
+   *   'none' supresses all errors.
+   *   'warning' is the default behavior in DOMDocument.
+   *   'strict' corresponds to DOMDocument strictErrorChecking TRUE.
    */
   public function __construct($xml = FALSE, $auto_register_namespaces = TRUE, $error_checking = 'strict') {
     parent::__construct();
 
     $this->setErrorChecking($error_checking);
-    
-    if(is_object($xml)){
+
+    if (is_object($xml)) {
       if (is_a($xml, 'DOMElement')) {
         $this->appendChild($this->importNode($xml, true));
       }
-      else if (is_a($xml, 'BetterDOMDocument\DOMDoc')) {
+      elseif (is_a($xml, 'BetterDOMDocument\DOMDoc')) {
         if ($xml->documentElement) {
           $this->appendChild($this->importNode($xml->documentElement, true));
         }
         $this->ns = $xml->ns;
       }
-      else if (is_a($xml, 'DOMDocument')) {
+      elseif (is_a($xml, 'DOMDocument')) {
         if ($xml->documentElement) {
           $this->appendChild($this->importNode($xml->documentElement, true));
         }
       }
-      else if (method_exists($xml, '__toString')) {
+      elseif (method_exists($xml, '__toString')) {
         $this->loadFromString($xml->__toString());
       }
     }
-    else if (is_string($xml) && !empty($xml)) {
+    elseif (is_string($xml) && !empty($xml)) {
       $this->loadFromString($xml);
     }
 
@@ -69,46 +67,48 @@ class DOMDoc extends \DOMDocument {
   }
 
   /**
-   * Register a namespace to be used in xpath queries
+   * Register a namespace to be used in xpath queries.
    *
    * @param string $prefix
-   *  Namespace prefix to register
-   *
+   *   Namespace prefix to register.
    * @param string $url
-   *  Connonical URL for this namespace prefix
+   *   Connonical URL for this namespace prefix.
    */
   public function registerNamespace($prefix, $url) {
     $this->ns[$prefix] = $url;
   }
 
   /**
-   * Get the list of registered namespaces as an array
+   * Get the list of registered namespaces as an array.
+   * 
+   * @return array
+   *   An array in form ['prefix' => 'namespace-uri']
    */
   public function getNamespaces() {
     return $this->ns;
   }
 
   /**
-   * Given a namespace URL, get the prefix
-   * 
+   * Given a namespace URL, get the prefix.
+   *
    * @param string $url
-   *  Connonical URL for this namespace prefix
-   * 
+   *   Connonical URL for this namespace prefix.
+   *
    * @return string|false
-   *  The namespace prefix or FALSE if there is no namespace with that URL
+   *   The namespace prefix or FALSE if there is no namespace with that URL.
    */
   public function lookupPrefix($url) {
     return array_search($url, $this->ns);
   }
 
   /**
-   * Given a namespace prefix, get the URL
-   * 
+   * Given a namespace prefix, get the URL.
+   *
    * @param string $prefix
-   *  namespace prefix
-   * 
-   * return string|false
-   *  The namespace URL or FALSE if there is no namespace with that prefix
+   *   Namespace prefix.
+   *
+   * @return string|false
+   *   The namespace URL or FALSE if there is no namespace with that prefix
    */
   public function lookupURL($prefix) {
     if (isset($this->ns[$prefix])) {
@@ -121,16 +121,16 @@ class DOMDoc extends \DOMDocument {
 
   /**
    * Given an xpath, get a list of nodes.
-   * 
+   *
    * @param string $xpath
-   *  xpath to be used for query
-   * 
+   *   XPath to be used for query.
+   *
    * @param mixed $context
-   *  $context can either be an xpath string, or a DOMElement
-   *  Provides context for the xpath query
-   * 
+   *   Can either be an xpath string, or a DOMElement.
+   *   Provides context for the xpath query.
+   *
    * @return DOMList|false
-   *  A DOMList object, which is very similar to a DOMNodeList, but with better iterabilility.
+   *   A DOMList object, which is very similar to a DOMNodeList, but with better iterabilility.
    */
   public function xpath($xpath, $context = NULL) {
     $this->createContext($context, 'xpath', FALSE);
@@ -138,7 +138,7 @@ class DOMDoc extends \DOMDocument {
     if ($context === FALSE) {
       return FALSE;
     }
-    
+
     $xob = new \DOMXPath($this);
 
     // Register the namespaces
