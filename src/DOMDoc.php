@@ -18,16 +18,16 @@ class DOMDoc extends \DOMDocument {
   /**
    * Create a new DOMDoc.
    *
-   * @param object|string $xml
+   * @param null|false|object|string $xml
    *   $xml can either be an XML string, a DOMDocument, or a DOMElement.
    *   You can also pass FALSE or NULL (or omit it) and load XML later using loadXML or loadHTML.
-   * @param true|string $auto_register_namespaces 
+   * @param bool|string $auto_register_namespaces 
    *   Auto-register namespaces. All namespaces in the root element will be registered for use in xpath queries.
    *   Namespaces that are not declared in the root element will not be auto-registered
    *   Defaults to TRUE (Meaning it will auto register all auxiliary namespaces but not the default namespace).
    *   Pass a prefix string to automatically register the default namespace.
    *   Pass FALSE to disable auto-namespace registeration.
-   * @param false|string $error_checking
+   * @param bool|string $error_checking
    *   Can be 'strict', 'warning', or 'none. Defaults to 'strict'.
    *   'none' supresses all errors.
    *   'warning' is the default behavior in DOMDocument.
@@ -126,7 +126,7 @@ class DOMDoc extends \DOMDocument {
    *   XPath to be used for query.
    *
    * @param mixed $context
-   *   $context can either be an xpath string, or a DOMElement.
+   *   Can either be an xpath string, or a DOMElement.
    *   Provides context for the xpath query.
    *
    * @return DOMList|false
