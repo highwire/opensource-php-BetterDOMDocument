@@ -60,7 +60,7 @@ class DOMList implements \Countable, \Iterator {
     else return FALSE;
   }
   
-  public function count() {
+  public function count(): int {
     return count($this->array);
   }
 }
