@@ -33,7 +33,7 @@ class DOMList implements \Countable, \Iterator {
     }
   }
 
-  public function rewind() {
+  public function rewind(): void {
     $this->position = 0;
   }
 
@@ -41,15 +41,15 @@ class DOMList implements \Countable, \Iterator {
     return $this->array[$this->position];
   }
 
-  public function key() {
+  public function key()): mixed {
     return $this->position;
   }
 
-  public function next() {
+  public function next(): void {
     ++$this->position;
   }
 
-  public function valid() {
+  public function valid(): bool {
     return isset($this->array[$this->position]);
   }
   
