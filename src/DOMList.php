@@ -41,7 +41,7 @@ class DOMList implements \Countable, \Iterator {
     return $this->array[$this->position];
   }
 
-  public function key()): mixed {
+  public function key(): mixed {
     return $this->position;
   }
 
