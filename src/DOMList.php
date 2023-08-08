@@ -40,7 +40,7 @@ class DOMList implements \Countable, \Iterator {
   public function current(): mixed {
     return $this->array[$this->position];
   }
-
+  
   public function key(): mixed {
     return $this->position;
   }
