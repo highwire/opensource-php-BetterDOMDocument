@@ -20,7 +20,7 @@ use BetterDOMDocument\DOMDoc;
 // We can load a new BetterDOMDocument from either a string or a DOMNode object
 $dom = new DOMDoc($xmlstring);
 
-// It's easy to output the entire document as an array, which is sometimes easier to work with in PHP
+// It's easy to output the entire document as an array, which is sometimes easier to work with in PHP.
 $array = $dom->getArray();
 
 // It's easy to query too!
