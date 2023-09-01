@@ -63,4 +63,5 @@ class DOMList implements \Countable, \Iterator {
   public function count(): int {
     return count($this->array);
   }
+
 }
