@@ -97,7 +97,7 @@ class DOMDoc extends \DOMDocument {
    * @return string|false
    *   The namespace prefix or FALSE if there is no namespace with that URL.
    */
-  public function lookupPrefix($url) {
+  public function lookupPrefix($url): ?string {
     return array_search($url, $this->ns);
   }
 
@@ -359,15 +359,14 @@ class DOMDoc extends \DOMDocument {
    *  The $newnode, properly attached to DOMDocument. If you passed $newnode as a DOMElement
    *  then you should replace your DOMElement with the returned one.
    */
-  public function append($newnode, $context = NULL) {
-    $this->createContext($newnode, 'xml');
-    $this->createContext($context, 'xpath');
-    
-    if (!$context || !$newnode) {
-      return FALSE;
+ public function append(...$nodes) : void {
+    // $nodes[0] is newnode.
+    // $nodes[1] is context.
+    $this->createContext($nodes[0], 'xml');
+    $this->createContext($nodes[1], 'xpath');
+    if ($nodes[0] && $nodes[1]) {
+      $nodes[1]->appendChild($nodes[0]);
     }
-
-    return $context->appendChild($newnode);
   }
   
   /**
@@ -384,15 +383,15 @@ class DOMDoc extends \DOMDocument {
    *  The $newnode, properly attached to DOMDocument. If you passed $newnode as a DOMElement
    *  then you should replace your DOMElement with the returned one.
    */
-  public function prepend($newnode, $context = NULL) {
-    $this->createContext($newnode, 'xml');
-    $this->createContext($context, 'xpath');
-    
-    if (!$context || !$newnode) {
-      return FALSE;
+   public function prepend(...$nodes): void {
+    // $nodes[0] is newnode.
+    // $nodes[1] is context.
+    $this->createContext($nodes[0], 'xml');
+    $this->createContext($nodes[1], 'xpath');
+
+    if ($context && $newnode) {
+      $nodes[1]->insertBefore($nodes[0], $nodes[1]->firstChild);
     }
-    
-    return $context->insertBefore($newnode, $context->firstChild);
   }
 
   /**
