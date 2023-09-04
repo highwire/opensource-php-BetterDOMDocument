@@ -21,10 +21,5 @@
     },
     "require": {
         "symfony/css-selector": "^4.0"
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.x-dev"
-        }
     }
 }
