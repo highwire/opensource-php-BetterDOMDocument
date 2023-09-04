@@ -20,11 +20,11 @@
         "phpunit/phpunit": ">=4.8.28 <5"
     },
     "require": {
-        "symfony/css-selector": "^4.0"
+        "symfony/css-selector": "*"
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "9.x-4.x-dev-b1"
+            "dev-master": "2.x-dev"
         }
     }
 }
