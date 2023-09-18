@@ -391,7 +391,7 @@ class DOMDoc extends \DOMDocument {
     $this->createContext($nodes[0], 'xml');
     $this->createContext($nodes[1], 'xpath');
 
-    if ($context && $newnode) {
+    if ($nodes[0] && $nodes[1]) {
       $nodes[1]->insertBefore($nodes[0], $nodes[1]->firstChild);
     }
   }
