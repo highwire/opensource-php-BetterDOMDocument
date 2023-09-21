@@ -345,20 +345,17 @@ class DOMDoc extends \DOMDocument {
     return $this->importNode($element, true);
   }
 
-  /**
-   * Append a child to the context node, make it the last child
-   * 
-   * @param mixed $newnode
-   *  $newnode can either be an XML string, a DOMDocument, or a DOMElement. 
-   * 
-   * @param mixed $context
-   *  $context can either be an xpath string, or a DOMElement
-   *  Omiting $context results in using the root document element as the context
-   * 
-   * @return DOMElement|false
-   *  The $newnode, properly attached to DOMDocument. If you passed $newnode as a DOMElement
-   *  then you should replace your DOMElement with the returned one.
-   */
+ /**
+  * Append a child to the context node, make it the first child
+  * 
+  * @param ...$nodes
+  *  ...$nodes can either be an XML string, a DOMDocument, or a DOMElement. 
+  *  newnode, context
+  *
+  * @return void
+  *  As per new DOMDocumentt prototype
+  *  Nothing to return.
+  */
  public function append(...$nodes) : void {
     // $nodes[0] is newnode.
     // $nodes[1] is context.
@@ -374,16 +371,13 @@ class DOMDoc extends \DOMDocument {
   /**
    * Append a child to the context node, make it the first child
    * 
-   * @param mixed $newnode
-   *  $newnode can either be an XML string, a DOMDocument, or a DOMElement. 
-   * 
-   * @param mixed $context
-   *  $context can either be an xpath string, or a DOMElement
-   *  Omiting $context results in using the root document element as the context
+   * @param ...$nodes
+   *  ...$nodes can either be an XML string, a DOMDocument, or a DOMElement. 
+   *  newnode, context
    *
-   * @return DOMElement|false
-   *  The $newnode, properly attached to DOMDocument. If you passed $newnode as a DOMElement
-   *  then you should replace your DOMElement with the returned one.
+   * @return void
+   *  As per new DOMDocument prototype
+   *  Nothing to return.
    */
   public function prepend(...$nodes): void {
     // $nodes[0] is newnode.
