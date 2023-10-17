@@ -24,7 +24,7 @@
     },
      "extra": {
         "branch-alias": {
-            "dev-master": "9.x-4.x-dev-b1"
+            "dev-master": "9.x-4.x-tag-update-dev"
         }
     }
 }
